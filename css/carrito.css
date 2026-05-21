@@ -1,0 +1,249 @@
+
+.carrito-section {
+    padding: 120px 20px 80px;
+    min-height: calc(100vh - 200px);
+}
+
+/* Items del carrito */
+.carrito-items {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-bottom: 32px;
+    box-shadow: var(--shadow);
+}
+
+.carrito-item {
+    display: grid;
+    grid-template-columns: 120px 1fr auto;
+    gap: 20px;
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+    transition: var(--transition);
+}
+
+.carrito-item:last-child {
+    border-bottom: none;
+}
+
+.carrito-item:hover {
+    background: var(--bg);
+    border-radius: var(--radius);
+}
+
+.carrito-item-img {
+    width: 120px;
+    height: 120px;
+    border-radius: var(--radius);
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.carrito-item-info h3 {
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+    color: var(--text);
+}
+
+.carrito-item-info p {
+    color: var(--text-light);
+    margin-bottom: 12px;
+}
+
+.carrito-item-precio {
+    font-size: 1.5rem;
+    color: var(--primary);
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+.carrito-item-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.cantidad-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg);
+    padding: 6px 12px;
+    border-radius: var(--radius);
+}
+
+.cantidad-control button {
+    width: 32px;
+    height: 32px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cantidad-control button:hover {
+    background: var(--primary-dark);
+    transform: scale(1.1);
+}
+
+.cantidad-control span {
+    min-width: 30px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.carrito-item-actions {
+    text-align: right;
+}
+
+.btn-eliminar {
+    background: transparent;
+    color: #e74c3c;
+    padding: 8px 16px;
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.btn-eliminar:hover {
+    background: #e74c3c;
+    color: white;
+}
+
+/* Resumen del carrito */
+.carrito-resumen {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    box-shadow: var(--shadow);
+    max-width: 450px;
+    margin-left: auto;
+}
+
+.resumen-line {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    font-size: 1.1rem;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+}
+
+.resumen-line:last-of-type {
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 16px;
+}
+
+.resumen-total {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 0;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text);
+}
+
+.resumen-total strong {
+    color: var(--primary);
+    font-size: 1.8rem;
+}
+
+.carrito-resumen .btn {
+    margin-top: 12px;
+}
+
+/* Carrito vacío */
+.carrito-vacio {
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.carrito-vacio i {
+    font-size: 5rem;
+    color: var(--text-light);
+    margin-bottom: 24px;
+}
+
+.carrito-vacio h2 {
+    font-size: 2rem;
+    margin-bottom: 16px;
+    color: var(--text);
+}
+
+.carrito-vacio p {
+    color: var(--text-light);
+    font-size: 1.1rem;
+    margin-bottom: 32px;
+}
+
+/* ====================== RESPONSIVE ====================== */
+@media (max-width: 768px) {
+    .carrito-item {
+        grid-template-columns: 90px 1fr;
+        gap: 16px;
+    }
+
+    .carrito-item-img {
+        width: 90px;
+        height: 90px;
+    }
+
+    .carrito-item-actions {
+        grid-column: 1 / -1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 12px;
+    }
+
+    .carrito-resumen {
+        max-width: 100%;
+        margin: 0;
+    }
+
+    .resumen-line,
+    .resumen-total {
+        font-size: 1rem;
+    }
+
+    .resumen-total strong {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .carrito-section {
+        padding: 100px 12px 60px;
+    }
+
+    .carrito-items {
+        padding: 16px;
+    }
+
+    .carrito-item {
+        padding: 16px 12px;
+    }
+
+    .carrito-item-info h3 {
+        font-size: 1.1rem;
+    }
+
+    .carrito-item-precio {
+        font-size: 1.3rem;
+    }
+
+    .cantidad-control button {
+        width: 28px;
+        height: 28px;
+        font-size: 1rem;
+    }
+
+    .carrito-resumen {
+        padding: 24px 20px;
+    }
+}
