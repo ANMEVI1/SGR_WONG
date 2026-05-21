@@ -153,7 +153,7 @@ button {
 }
 
 /* =========================
-    Buttons / Icons
+   Buttons / Icons
 ========================= */
 
 .icon-btn {
@@ -633,7 +633,7 @@ body.modal-open main {
   position: fixed;
   bottom: 24px;
   left: 50%;
-  z-index: 1300;
+  z-index: 200;
   padding: 10px 18px;
   border-radius: 999px;
   background: var(--black);
@@ -682,7 +682,7 @@ body.modal-open main {
 }
 
 /* =========================
-  Motion Accessibility
+   Motion Accessibility
 ========================= */
 
 @media (prefers-reduced-motion: reduce) {
@@ -693,112 +693,5 @@ body.modal-open main {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
-  }
-}
-/* =========================
-   SCROLL INTERNO DEL MODAL
-   Solo parte blanca de edición
-========================= */
-
-.modal-overlay {
-  overflow: hidden;
-}
-
-.modal {
-  max-height: calc(100dvh - 24px);
-  height: auto;
-  overflow: hidden;
-}
-
-.content {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 91, 91, 0.35) transparent;
-}
-
-/* Barra de scroll elegante para WebKit */
-.content::-webkit-scrollbar {
-  width: 7px;
-}
-
-.content::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.content::-webkit-scrollbar-thumb {
-  background: rgba(255, 91, 91, 0.28);
-  border-radius: 999px;
-}
-
-.content::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 91, 91, 0.42);
-}
-
-/* Tablet vertical */
-@media (max-width: 768px) {
-  .modal-overlay {
-    padding: 8px;
-    align-items: center;
-  }
-
-  .modal {
-    grid-template-columns: 1fr;
-    width: 100%;
-    max-width: 100%;
-    max-height: calc(100dvh - 16px);
-    border-radius: 18px;
-  }
-
-  .side {
-    flex: 0 0 auto;
-  }
-
-  .content {
-    max-height: calc(100dvh - 280px);
-    padding: 20px 18px 18px;
-  }
-}
-
-/* Mobile grande */
-@media (max-width: 640px) {
-  .modal-overlay {
-    padding: 6px;
-  }
-
-  .modal {
-    max-height: calc(100dvh - 12px);
-    border-radius: 16px;
-  }
-
-  .content {
-    max-height: calc(100dvh - 245px);
-    padding: 16px 14px 16px;
-  }
-
-  .section-head {
-    margin-bottom: 16px;
-  }
-
-  .form-grid {
-    gap: 12px;
-  }
-}
-
-/* Mobile pequeño */
-@media (max-width: 420px) {
-  .content {
-    max-height: calc(100dvh - 232px);
-    padding: 14px 12px 14px;
-  }
-
-  .field input,
-  .field select {
-    min-height: 42px;
-  }
-
-  .btn {
-    min-height: 42px;
   }
 }
