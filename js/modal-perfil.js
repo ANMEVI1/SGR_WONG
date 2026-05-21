@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeBtn = document.getElementById("closeModal");
   const content = document.getElementById("content");
   const toast = document.getElementById("toast");
-  const menuItems = document.querySelectorAll(".menu-item");
   const profileContainer = document.querySelector(".user-logged");
   const openTrigger = openBtn || profileContainer;
 
@@ -157,20 +156,13 @@ document.addEventListener("DOMContentLoaded", () => {
     logout: () => `<div class="empty-state">Cerrando sesión…</div>`,
   };
 
+  let toastTimer;
+
   function showToast(msg) {
     toast.textContent = msg;
     toast.classList.add("show");
-    clearTimeout(showToast._timer);
-    showToast._timer = setTimeout(() => toast.classList.remove("show"), 2200);
-  }
-
-  function render(section) {
-    content.innerHTML = sections[section] ? sections[section]() : sections.datos();
-    document.querySelectorAll(".menu-item").forEach((m) =>
-      m.classList.toggle("active", m.dataset.section === section)
-    );
-    bindSection(section);
-    content.scrollTo({ top: 0, behavior: "smooth" });
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
   }
 
   function toggleInputs(inputs, enable) {
@@ -245,7 +237,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const correo = form.querySelector('[name="correo"]')?.value.trim();
         const documento = form.querySelector('[name="num_documento"]')?.value.trim();
         const telefono = form.querySelector('[name="telefono"]')?.value.trim();
-        const direccion = form.querySelector('[name="direccion"]')?.value.trim();
         const tipo = tipoHidden?.value || "DNI";
 
         if (!nombre || !correo || !documento || !telefono) {
@@ -268,13 +259,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (result.success) {
           showToast(result.message || "Datos guardados correctamente");
-          const updated = new FormData(form);
-          profileData.nombre = updated.get("nombre_completo") || profileData.nombre;
-          profileData.correo = updated.get("correo") || profileData.correo;
-          profileData.tipoDocumento = updated.get("tipo_documento") || profileData.tipoDocumento;
-          profileData.documento = updated.get("num_documento") || profileData.documento;
-          profileData.telefono = updated.get("telefono") || profileData.telefono;
-          profileData.direccion = updated.get("direccion") || profileData.direccion;
+          profileData.nombre = form.querySelector('[name="nombre_completo"]')?.value || profileData.nombre;
+          profileData.correo = form.querySelector('[name="correo"]')?.value || profileData.correo;
+          profileData.tipoDocumento = tipo;
+          profileData.documento = documento;
+          profileData.telefono = telefono;
+          profileData.direccion = form.querySelector('[name="direccion"]')?.value || profileData.direccion;
           setEditing(false);
 
           const userEmailNode = document.querySelector(".user-email");
@@ -327,6 +317,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const result = await submitForm(endpoints.password, new FormData(form));
+
         if (result.success) {
           showToast(result.message || "Contraseña actualizada correctamente");
           form.reset();
@@ -341,7 +332,18 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    if (section === "logout") handleLogout();
+    if (section === "logout") {
+      handleLogout();
+    }
+  }
+
+  function render(section) {
+    content.innerHTML = sections[section] ? sections[section]() : sections.datos();
+    document.querySelectorAll(".menu-item").forEach((m) =>
+      m.classList.toggle("active", m.dataset.section === section)
+    );
+    bindSection(section);
+    content.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function openModal() {
@@ -365,9 +367,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   closeBtn.addEventListener("click", closeModal);
+
   overlay.addEventListener("click", (e) => {
     if (e.target === overlay) closeModal();
   });
+
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && overlay.classList.contains("open")) closeModal();
   });

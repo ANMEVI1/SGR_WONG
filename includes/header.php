@@ -2,9 +2,9 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
 $loggedIn = !empty($_SESSION['usuario_login']) || !empty($_SESSION['ingresar']);
 $loginName = $_SESSION['usuario_login'] ?? $_SESSION['ingresar'] ?? '';
-$firstName = $loginName !== '' ? explode(' ', trim($loginName))[0] : '';
 ?>
 <header class="header">
     <section class="container header-container">
