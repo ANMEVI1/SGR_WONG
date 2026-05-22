@@ -367,7 +367,7 @@ main {
 }
 
 .mini-item {
-    min-width: 300px;
+    min-width: 400;
     background: white;
     border-radius: var(--radius-lg);
     overflow: hidden;

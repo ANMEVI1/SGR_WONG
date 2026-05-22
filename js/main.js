@@ -7,179 +7,249 @@ const platos = [
     // Sopas
     { 
         id: 1, 
-        nombre: "Taypa a la plancha ", 
+        nombre: "Taypa a la plancha", 
         precio: 18.00, 
         stock: 22, 
         categoria: "sopas", 
         top: true, 
         promo: false, 
-        img : "taypa_plancha .jpg", 
+        img: "taypa_plancha .jpg", 
         desc: "Sopa tradicional con fideos, verduras y condimentos chinos." 
     },
     { 
         id: 2, 
-        nombre: "Sopa wantan", 
+        nombre: "Sopa Wantan", 
         precio: 16.00, 
         stock: 18, 
         categoria: "sopas", 
         top: false, 
         promo: false, 
         img: "Sopa-wantan-768x510.jpg", 
-        desc: "Sopa suave de tofu con champiñones y cebolla china." 
+        desc: "Sopa wantan con pollo o wantan frito." 
     },
 
     // Chaufas
     { 
         id: 3, 
-        nombre: "Chaufa Especial", 
-        precio: 28.00, 
+        nombre: "Chaufa de Carne", 
+        precio: 18.00, 
         stock: 20, 
         categoria: "chaufa", 
         top: true, 
-        promo: true, 
-        img: "chaufa_especial.jpg", 
-        desc: "Chaufa mixto con pollo, cerdo, huevo y verduras." 
+        promo: false, 
+        img: "https://images.unsplash.com/photo-1543353071-873f17a7a088?auto=format&fit=crop&w=800&q=80", 
+        desc: "Chaufa de carne al estilo chifa." 
     },
     { 
         id: 4, 
         nombre: "Chaufa de Pollo", 
-        precio: 24.00, 
+        precio: 15.00, 
         stock: 25, 
         categoria: "chaufa", 
         top: false, 
         promo: false, 
-        img: "FLAYER01.jpeg", 
-        desc: "Chaufa clásico con pollo sazonado y arroz frito." 
+        img: "https://images.unsplash.com/photo-1495195134817-aeb325a55b65?auto=format&fit=crop&w=800&q=80", 
+        desc: "Chaufa con pollo sazonado y arroz frito." 
     },
     { 
         id: 5, 
-        nombre: "Chaufa de Langostinos", 
-        precio: 34.00, 
+        nombre: "Chaufa Tumbesino", 
+        precio: 19.00, 
         stock: 14, 
         categoria: "chaufa", 
         top: false, 
         promo: false, 
-        img: "FLAYER01.jpeg", 
-        desc: "Chaufa de langostinos con pimientos y cebolla china." 
+        img: "https://images.unsplash.com/photo-1528715471579-d3616b752a5f?auto=format&fit=crop&w=800&q=80", 
+        desc: "Chaufa tumbesino con ingredientes especiales." 
     },
 
     // Tallarines
     { 
         id: 6, 
-        nombre: "Tallarín Saltado", 
-        precio: 27.00, 
+        nombre: "Tallarín con Carne", 
+        precio: 19.00, 
         stock: 18, 
         categoria: "tallarines", 
         top: true, 
         promo: false, 
-        img: "tallarin saltado.png", 
-        desc: "Tallarín salteado con carne, verduras y salsa oriental." 
+        img: "https://images.unsplash.com/photo-1512058564366-c9e4a3f4d9e3?auto=format&fit=crop&w=800&q=80", 
+        desc: "Tallarín salteado con carne y verduras." 
     },
     { 
         id: 7, 
-        nombre: "Tallarín con Carne", 
-        precio: 28.50, 
+        nombre: "Tallarín con Chancho", 
+        precio: 20.00, 
         stock: 15, 
         categoria: "tallarines", 
         top: false, 
         promo: false, 
-        img: "FLAYER01.jpeg", 
-        desc: "Tallarín salteado con trozos de carne y verduras frescas." 
+        img: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=800&q=80", 
+        desc: "Tallarín con chancho y verduras al estilo chino." 
     },
 
     // Pollo
     { 
         id: 8, 
-        nombre: "Pollo al Ajo", 
-        precio: 29.00, 
+        nombre: "Pollo con Verduras", 
+        precio: 19.00, 
         stock: 16, 
         categoria: "pollo", 
         top: true, 
-        promo: true, 
-        img: "FLAYER01.jpeg", 
-        desc: "Pollo salteado al ajo con verduras y salsa especial." 
+        promo: false, 
+        img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80", 
+        desc: "Pollo salteado con verduras y salsa especial." 
     },
     { 
         id: 9, 
-        nombre: "Pollo Broaster Chifa", 
-        precio: 25.00, 
+        nombre: "Pollo Malakay", 
+        precio: 19.00, 
         stock: 20, 
         categoria: "pollo", 
         top: false, 
         promo: false, 
-        img: "FLAYER01.jpeg", 
-        desc: "Pollo crujiente acompañado de arroz chaufa." 
+        img: "https://images.unsplash.com/photo-1514516870926-123dc2e3d2d5?auto=format&fit=crop&w=800&q=80", 
+        desc: "Pollo malakay con salsa picante suave." 
     },
 
-    // Langostinos
+    // Lomo
     { 
         id: 10, 
-        nombre: "Langostinos al Ajo", 
-        precio: 38.00, 
+        nombre: "Lomo Saltado con Pollo", 
+        precio: 18.00, 
         stock: 10, 
-        categoria: "langostinos", 
+        categoria: "lomo", 
         top: true, 
         promo: false, 
-        img: "FLAYER01.jpeg", 
-        desc: "Langostinos salteados al ajo con un toque de cilantro." 
+        img: "https://images.unsplash.com/photo-1495195129352-a54dab37b8e2?auto=format&fit=crop&w=800&q=80", 
+        desc: "Lomo saltado con pollo y verduras." 
     },
     { 
         id: 11, 
-        nombre: "Langostinos al Vapor", 
-        precio: 38.00, 
+        nombre: "Lomo Saltado con Carne", 
+        precio: 19.00, 
         stock: 8, 
-        categoria: "langostinos", 
+        categoria: "lomo", 
         top: false, 
         promo: false, 
-        img: "FLAYER01.jpeg", 
-        desc: "Langostinos al vapor con salsa de soja ligera." 
+        img: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80", 
+        desc: "Lomo saltado con carne y salsa especial." 
     },
 
-    // Pescados y Vapor
+    // Especiales
     { 
         id: 12, 
-        nombre: "Ceviche de Mero Chino", 
-        precio: 38.00, 
+        nombre: "Kaluw Wantan", 
+        precio: 20.00, 
         stock: 12, 
-        categoria: "pescados", 
+        categoria: "especiales", 
         top: false, 
         promo: false, 
-        img: "FLAYER01.jpeg", 
-        desc: "Ceviche estilo chifa con pescado fresco y limón." 
+        img: "https://images.unsplash.com/photo-1515496642597-7ddab3f23fdc?auto=format&fit=crop&w=800&q=80", 
+        desc: "Wantan crujiente con salsa kaluw." 
     },
     { 
         id: 13, 
-        nombre: "Ostra al Vapor", 
-        precio: 38.00, 
+        nombre: "Taypa con Chaufa", 
+        precio: 22.00, 
         stock: 10, 
-        categoria: "vapor", 
+        categoria: "especiales", 
         top: false, 
         promo: false, 
-        img: "refrescos.avif", 
-        desc: "Ostras al vapor con salsa de ostión y hierbas." 
+        img: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80", 
+        desc: "Taypa servido con chaufa y verduras." 
+    },
+
+    // Tortillas y combinados
+    { 
+        id: 14, 
+        nombre: "Tortilla con Pollo", 
+        precio: 20.00, 
+        stock: 14, 
+        categoria: "tortillas", 
+        top: false, 
+        promo: false, 
+        img: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=800&q=80", 
+        desc: "Tortilla rellena de pollo y verduras." 
+    },
+    { 
+        id: 15, 
+        nombre: "Combinado de Chancho", 
+        precio: 20.00, 
+        stock: 16, 
+        categoria: "combinados", 
+        top: false, 
+        promo: false, 
+        img: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80", 
+        desc: "Combinado de chancho con arroz y ensalada." 
+    },
+    { 
+        id: 16, 
+        nombre: "Combinado de Carne", 
+        precio: 19.00, 
+        stock: 18, 
+        categoria: "combinados", 
+        top: false, 
+        promo: false, 
+        img: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80", 
+        desc: "Combinado de carne con arroz chaufa." 
+    },
+
+    // Langostinos y pescado
+    { 
+        id: 17, 
+        nombre: "Langostino con Verdura", 
+        precio: 23.00, 
+        stock: 12, 
+        categoria: "langostinos", 
+        top: false, 
+        promo: false, 
+        img: "https://images.unsplash.com/photo-1512058564366-c9e4a3f4d9e3?auto=format&fit=crop&w=800&q=80", 
+        desc: "Langostino salteado con verduras." 
+    },
+    { 
+        id: 18, 
+        nombre: "Pescado con Tausi", 
+        precio: 22.00, 
+        stock: 10, 
+        categoria: "pescados", 
+        top: false, 
+        promo: false, 
+        img: "https://images.unsplash.com/photo-1490647111677-014db1b52f4c?auto=format&fit=crop&w=800&q=80", 
+        desc: "Pescado con salsa tausí y verduras." 
+    },
+    { 
+        id: 19, 
+        nombre: "Pescado con Tamarindo", 
+        precio: 22.00, 
+        stock: 10, 
+        categoria: "pescados", 
+        top: false, 
+        promo: false, 
+        img: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80", 
+        desc: "Pescado con salsa de tamarindo." 
     },
 
     // Bebidas
     { 
-        id: 14, 
+        id: 20, 
         nombre: "Cerveza Cusqueña", 
         precio: 10.00, 
         stock: 40, 
         categoria: "bebidas", 
         top: false, 
         promo: false, 
-        img: "refrescos.avif", 
+        img: "https://images.unsplash.com/photo-1532634896-26909d0d3b0b?auto=format&fit=crop&w=800&q=80", 
         desc: "Cerveza fría ideal para acompañar tu chifa." 
     },
     { 
-        id: 15, 
+        id: 21, 
         nombre: "Agua Mineral", 
         precio: 4.00, 
         stock: 60, 
         categoria: "bebidas", 
         top: false, 
         promo: false, 
-        img: "refrescos.avif", 
+        img: "https://images.unsplash.com/photo-1524594154909-458d3c7cc973?auto=format&fit=crop&w=800&q=80", 
         desc: "Agua sin gas 500ml para refrescar." 
     }
 ];
@@ -247,6 +317,10 @@ if (prevBtn) {
 }
 
 // ====================== RENDER FUNCIONES ======================
+function getImageSrc(img) {
+    return img.startsWith('http://') || img.startsWith('https://') ? img : `assets/${img}`;
+}
+
 function renderMenu() {
     if (!menuGrid) return;
     
@@ -257,7 +331,7 @@ function renderMenu() {
         
         return `
             <article class="menu-item" onclick="verDetalle(${plato.id})">
-                <img src="assets/${plato.img}" alt="${plato.nombre}" loading="lazy">
+                <img src="${getImageSrc(plato.img)}" alt="${plato.nombre}" loading="lazy">
                 <div class="menu-item-content">
                     <h3>
                         ${plato.nombre} 
@@ -287,7 +361,7 @@ function renderTopVentas() {
     if (container && top.length > 0) {
         container.innerHTML = top.map(p => `
             <div class="mini-item" onclick="verDetalle(${p.id})">
-                <img src="assets/${p.img}" alt="${p.nombre}" loading="lazy">
+                <img src="${getImageSrc(p.img)}" alt="${p.nombre}" loading="lazy">
                 <p>${p.nombre}</p>
                 <span>S/ ${p.precio.toFixed(2)}</span>
             </div>
@@ -302,7 +376,7 @@ function renderPromociones() {
     if (container && promo.length > 0) {
         container.innerHTML = promo.map(p => `
             <div class="mini-item promo" onclick="verDetalle(${p.id})">
-                <img src="assets/${p.img}" alt="${p.nombre}" loading="lazy">
+                <img src="${getImageSrc(p.img)}" alt="${p.nombre}" loading="lazy">
                 <p>${p.nombre} <strong>¡Oferta!</strong></p>
                 <span>S/ ${p.precio.toFixed(2)}</span>
             </div>
