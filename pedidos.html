@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Completar Pedido - Chifa Matsue</title>
+    <link rel="stylesheet" href="css/estilos.css">
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/responsivo.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <section class="container header-container">
+            <a href="index.html" class="logo">
+                <img src="assets/logo_proyect.svg" alt="Logo Chifa Matsue"><span>Chifa Matsue</span>
+            </a>
+            <div class="header-right">
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Buscar plato..." aria-label="Buscar plato">
+                    <i class="fas fa-search"></i>
+                    <div class="search-results" id="searchResults" role="listbox"></div>
+                </div>
+                <div class="cart-icon">
+                    <a href="carrito.html" aria-label="Ver carrito">
+                        <i class="fas fa-shopping-cart"></i><span id="cartCount">0</span>
+                    </a>
+                </div>
+                <div class="user-icon">
+                    <a href="login.html">
+                        <i class="fas fa-user"></i><span class="user-text">Iniciar sesión</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </header>
+    <main class="container pedido-section">
+        <h1 class="section-title">Completar Pedido</h1>
+        <form id="formPedido" class="order-form">
+            <div class="form-section">
+                <h3>Datos de Entrega</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nombre Completo</label>
+                        <input type="text" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Teléfono</label>
+                        <input type="tel" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Dirección completa</label>
+                    <input type="text" required>
+                </div>
+                <div class="form-group">
+                    <label>Referencia (opcional)</label>
+                    <input type="text">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Método de Pago</h3>
+                <div class="payment-options">
+                    <label><input type="radio" name="pago" value="efectivo"> Efectivo</label>
+                    <label><input type="radio" name="pago" value="yape"> Yape</label>
+                    <label><input type="radio" name="pago" value="plin"> Plin</label>
+                    <label><input type="radio" name="pago" value="tarjeta"> Tarjeta (Culqi)</label>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Tipo de Comprobante</h3>
+                <label><input type="radio" name="comprobante" value="boleta"> Boleta</label>
+                <label><input type="radio" name="comprobante" value="factura"> Factura</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full">Confirmar Pedido</button>
+        </form>
+    </main>
+<footer class="footer">
+        <section  class="container footer-grid">
+            
+            <div class="footer-brand">
+                <div class="footer-logo-box">
+                    <img src="assets/logo_proyect.svg" alt="Logo Chifa Matsue">
+                    <span>Chifa Matsue</span>
+                </div>
+                <p>La mejor comida rápida de la ciudad, preparada con ingredientes frescos y mucho amor. ¡Siente el sabor!</p>
+                <div class="social-icons">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-links">
+                <h3>Atención al Cliente</h3>
+                <ul>
+                    <li><i class="fas fa-phone"></i> +51 999 999 999</li>
+                    <li><i class="fab fa-whatsapp"></i> +51 999 999 999</li>
+                    <li><a href="#"><i class="fas fa-comment-dots"></i> Encuesta de satisfacción</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-links">
+                <h3>Enlaces Útiles</h3>
+                <ul>
+                    <li><a href="reclamaciones.html"><i class="fas fa-file-alt"></i> Libro de Reclamaciones</a></li>
+                </ul>
+            </div>
+
+            <div class="qr-section">
+                <h3>¡Pide Rápido!</h3>
+                <p>Escanea el código QR</p>
+                <img src="assets/qr.png" alt="Código QR para pedidos rápidos">
+            </div>
+        </section>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2025 Chifa Matsue. Todos los derechos reservados.</p>
+            <p class="footer-dev">Desarrollado por: RAMOS, RICHARD Y ANDRE </p>
+        </div>
+    </footer>
+    <script src="js/pedido.js"></script>
+</body>
+</html>

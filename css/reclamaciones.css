@@ -1,0 +1,275 @@
+/* ====================== LIBRO DE RECLAMACIONES STYLES ====================== */
+
+.reclamaciones-section {
+    padding: 120px 20px 80px;
+    min-height: calc(100vh - 200px);
+}
+
+.reclamaciones-section .section-title {
+    margin-bottom: 20px;
+}
+
+/* Información legal */
+.reclamaciones-info {
+    background: var(--bg);
+    padding: 24px 32px;
+    border-radius: var(--radius-lg);
+    margin-bottom: 40px;
+    border-left: 5px solid var(--primary);
+}
+
+.reclamaciones-info h3 {
+    font-size: 1.3rem;
+    color: var(--text);
+    margin-bottom: 12px;
+    font-weight: 700;
+}
+
+.reclamaciones-info p {
+    color: var(--text-light);
+    line-height: 1.7;
+    font-size: 1rem;
+}
+
+.reclamaciones-info ul {
+    margin-top: 16px;
+    padding-left: 20px;
+    list-style: disc;
+}
+
+.reclamaciones-info ul li {
+    color: var(--text-light);
+    margin-bottom: 8px;
+    line-height: 1.6;
+}
+
+/* Formulario */
+.reclamaciones-form {
+    background: white;
+    padding: 48px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    max-width: 800px;
+    margin: 0 auto;
+    animation: fadeInUp 0.5s ease;
+}
+
+.reclamaciones-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Grid para campos en 2 columnas */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 10px;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-group label i {
+    color: var(--primary);
+    font-size: 1.1rem;
+}
+
+.form-group label .required {
+    color: #e74c3c;
+    font-size: 1.1rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-family: inherit;
+    transition: var(--transition);
+    background: white;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(222, 83, 2, 0.1);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 150px;
+    line-height: 1.6;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: var(--text-light);
+}
+
+.form-group select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+}
+
+/* Helper text */
+.form-helper {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-top: 6px;
+    font-style: italic;
+}
+
+/* Botón de envío */
+.reclamaciones-form button[type="submit"] {
+    margin-top: 16px;
+    font-size: 1.1rem;
+    padding: 16px 24px;
+}
+
+/* Mensaje de éxito/error */
+.form-message {
+    padding: 16px 20px;
+    border-radius: var(--radius);
+    margin-bottom: 24px;
+    font-weight: 600;
+    text-align: center;
+    animation: fadeInDown 0.4s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.form-message i {
+    font-size: 1.3rem;
+}
+
+.form-message.success {
+    background: #d4edda;
+    color: #155724;
+    border: 2px solid #c3e6cb;
+}
+
+.form-message.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 2px solid #f5c6cb;
+}
+
+/* Nota legal al final */
+.reclamaciones-nota {
+    background: var(--bg);
+    padding: 20px 28px;
+    border-radius: var(--radius);
+    margin-top: 32px;
+    text-align: center;
+}
+
+.reclamaciones-nota p {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.reclamaciones-nota strong {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ====================== RESPONSIVE ====================== */
+@media (max-width: 768px) {
+    .reclamaciones-section {
+        padding: 100px 16px 60px;
+    }
+
+    .reclamaciones-form {
+        padding: 32px 24px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .reclamaciones-info {
+        padding: 20px 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .reclamaciones-section {
+        padding: 100px 12px 40px;
+    }
+
+    .reclamaciones-form {
+        padding: 24px 20px;
+    }
+
+    .form-group {
+        gap: 20px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 12px 14px;
+    }
+
+    .form-group textarea {
+        min-height: 120px;
+    }
+
+    .reclamaciones-form button[type="submit"] {
+        padding: 14px 20px;
+        font-size: 1rem;
+    }
+
+    .reclamaciones-nota {
+        padding: 16px 20px;
+    }
+}

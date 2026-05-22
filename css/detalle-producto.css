@@ -1,0 +1,339 @@
+
+.producto-detalle {
+    padding: 120px 20px 80px;
+    min-height: calc(100vh - 200px);
+}
+
+.producto-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: start;
+    background: white;
+    padding: 48px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    animation: fadeInUp 0.5s ease;
+}
+
+/* Imagen del producto */
+.producto-imagen {
+    position: sticky;
+    top: 100px;
+}
+
+.producto-imagen img {
+    width: 100%;
+    height: auto;
+    max-height: 600px;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.producto-imagen img:hover {
+    transform: scale(1.02);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Info del producto */
+.producto-info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.producto-info h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: 8px;
+}
+
+.producto-info > p {
+    color: var(--text-light);
+    font-size: 1.1rem;
+    line-height: 1.7;
+    margin-bottom: 8px;
+}
+
+.producto-precio {
+    font-size: 2.5rem;
+    color: var(--primary);
+    font-weight: bold;
+    margin: 16px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.producto-precio span {
+    font-size: 3rem;
+}
+
+/* Stock info */
+.stock-info {
+    background: var(--bg);
+    padding: 16px 20px;
+    border-radius: var(--radius);
+    border-left: 4px solid var(--primary);
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.stock-info strong {
+    color: var(--primary);
+    font-size: 1.2rem;
+}
+
+/* Control de cantidad */
+.cantidad-control {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--bg);
+    padding: 12px 20px;
+    border-radius: var(--radius-lg);
+    width: fit-content;
+    margin: 8px 0;
+}
+
+.cantidad-control button {
+    width: 44px;
+    height: 44px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+.cantidad-control button:hover {
+    background: var(--primary-dark);
+    transform: scale(1.1);
+}
+
+.cantidad-control button:active {
+    transform: scale(0.95);
+}
+
+.cantidad-control input {
+    width: 70px;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px;
+    color: var(--text);
+}
+
+.cantidad-control input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(222, 83, 2, 0.1);
+}
+
+/* Botones de acción */
+.producto-info .btn {
+    margin-top: 8px;
+    font-size: 1.1rem;
+    padding: 16px 24px;
+}
+
+/* Características adicionales */
+.producto-caracteristicas {
+    margin-top: 32px;
+    padding-top: 32px;
+    border-top: 2px solid var(--border);
+}
+
+.producto-caracteristicas h3 {
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+    color: var(--text);
+    font-weight: 700;
+}
+
+.producto-caracteristicas ul {
+    list-style: none;
+    padding: 0;
+}
+
+.producto-caracteristicas ul li {
+    padding: 10px 0;
+    color: var(--text-light);
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.producto-caracteristicas ul li::before {
+    content: '✓';
+    color: var(--primary);
+    font-weight: bold;
+    font-size: 1.3rem;
+}
+
+/* Badges y etiquetas */
+.producto-badges {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: inline-block;
+}
+
+.badge-promo {
+    background: #e74c3c;
+    color: white;
+}
+
+.badge-nuevo {
+    background: #2ecc71;
+    color: white;
+}
+
+.badge-popular {
+    background: #f39c12;
+    color: white;
+}
+
+/* Estado sin stock */
+.producto-sin-stock .btn-primary {
+    background: #ccc !important;
+    cursor: not-allowed !important;
+    opacity: 0.6;
+}
+
+.producto-sin-stock .cantidad-control {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ====================== RESPONSIVE ====================== */
+@media (max-width: 992px) {
+    .producto-grid {
+        gap: 40px;
+        padding: 40px;
+    }
+
+    .producto-info h1 {
+        font-size: 2.2rem;
+    }
+
+    .producto-precio {
+        font-size: 2rem;
+    }
+
+    .producto-precio span {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .producto-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+        padding: 32px 24px;
+    }
+
+    .producto-imagen {
+        position: relative;
+        top: 0;
+    }
+
+    .producto-imagen img {
+        max-height: 400px;
+    }
+
+    .producto-info h1 {
+        font-size: 2rem;
+    }
+
+    .producto-precio {
+        font-size: 1.8rem;
+    }
+
+    .producto-precio span {
+        font-size: 2.2rem;
+    }
+
+    .cantidad-control {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .producto-detalle {
+        padding: 100px 12px 60px;
+    }
+
+    .producto-grid {
+        padding: 24px 20px;
+    }
+
+    .producto-imagen img {
+        max-height: 300px;
+    }
+
+    .producto-info h1 {
+        font-size: 1.7rem;
+    }
+
+    .producto-precio {
+        font-size: 1.5rem;
+    }
+
+    .producto-precio span {
+        font-size: 2rem;
+    }
+
+    .cantidad-control {
+        padding: 10px 16px;
+    }
+
+    .cantidad-control button {
+        width: 40px;
+        height: 40px;
+        font-size: 1.3rem;
+    }
+
+    .cantidad-control input {
+        width: 60px;
+        font-size: 1.3rem;
+    }
+
+    .producto-info .btn {
+        padding: 14px 20px;
+        font-size: 1rem;
+    }
+}

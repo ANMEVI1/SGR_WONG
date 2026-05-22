@@ -1,0 +1,6 @@
+Quién lea esto, es porque quiere saber más sobre el proyecto:
+funcionalidades que se ah logrado:
+1.- logear con un correo y contraseña
+2.- validar login si existe
+3.- editar y eliminar información personal del cliente, (edición de perfil)
+4.- header-menú y modal-perfil completados, falta ajustar info del sidebar-menu lateral.
