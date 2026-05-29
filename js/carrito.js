@@ -18,7 +18,7 @@ function renderCarrito() {
             <div class="carrito-vacio">
                 <i class="fas fa-shopping-cart fa-3x"></i>
                 <p>Tu carrito está vacío</p>
-                <a href="index.html" class="btn btn-primary">Explorar Menú</a>
+                <a href="../../index.php" class="btn btn-primary">Explorar Menú</a>
             </div>`;
         btnPagar.disabled = true;
         return;
@@ -62,9 +62,9 @@ function setupEventListeners() {
         const usuario = JSON.parse(localStorage.getItem('usuario'));
         if (!usuario) {
             alert('Debes iniciar sesión para continuar con el pago');
-            window.location.href = 'login.html?redirect=pedido.html';
+            window.location.href = '../../login.php?redirect=pedido';
         } else {
-            window.location.href = 'pedido.html';
+            window.location.href = '../../pedido.php';
         }
     });
 }

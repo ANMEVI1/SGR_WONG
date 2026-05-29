@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba Empleados</title>
+    <link rel="stylesheet" href="../../../css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <h2>Prueba de Interfaz de Empleados</h2>
+    
+    <!-- Filtros de prueba -->
+    <div style="margin: 20px 0;">
+        <select id="filtroRol">
+            <option value="">Todos los roles</option>
+            <option value="Administrador">Administrador</option>
+            <option value="Cajero">Cajero</option>
+            <option value="Mozo">Mozo</option>
+        </select>
+        <input type="text" id="buscarEmpleado" placeholder="Buscar..." style="margin-left: 10px;">
+    </div>
+    
+    <!-- Tabla de prueba -->
+    <table id="tablaEmpleados" style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background: #f0f0f0;">
+                <th style="padding: 10px; border: 1px solid #ddd;">Empleado</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">DNI</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">Rol</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-rol="Administrador">
+                <td style="padding: 10px; border: 1px solid #ddd;">Carlos Mendoza</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">45231876</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">Administrador</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">
+                    <button onclick="editarEmpleado(1)">Editar</button>
+                </td>
+            </tr>
+            <tr data-rol="Cajero">
+                <td style="padding: 10px; border: 1px solid #ddd;">María Torres</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">52341987</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">Cajero</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">
+                    <button onclick="editarEmpleado(2)">Editar</button>
+                </td>
+            </tr>
+            <tr data-rol="Mozo">
+                <td style="padding: 10px; border: 1px solid #ddd;">José Quispe</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">63452198</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">Mozo</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">
+                    <button onclick="editarEmpleado(3)">Editar</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+    // Prueba de filtros
+    document.getElementById('filtroRol').addEventListener('change', function() {
+        console.log('Filtro rol cambiado:', this.value);
+        filtrarTabla();
+    });
+    
+    document.getElementById('buscarEmpleado').addEventListener('input', function() {
+        console.log('Búsqueda:', this.value);
+        filtrarTabla();
+    });
+
+    function filtrarTabla() {
+        const filtroRol = document.getElementById('filtroRol').value;
+        const busqueda = document.getElementById('buscarEmpleado').value.toLowerCase();
+        const filas = document.querySelectorAll('#tablaEmpleados tbody tr');
+        
+        console.log('Filtrando - Rol:', filtroRol, 'Búsqueda:', busqueda);
+
+        filas.forEach(fila => {
+            const rol = fila.dataset.rol;
+            const texto = fila.textContent.toLowerCase();
+            
+            const coincideRol = !filtroRol || rol === filtroRol;
+            const coincideBusqueda = !busqueda || texto.includes(busqueda);
+            
+            console.log('Fila:', rol, 'Coincide rol:', coincideRol, 'Coincide búsqueda:', coincideBusqueda);
+            
+            fila.style.display = coincideRol && coincideBusqueda ? '' : 'none';
+        });
+    }
+
+    function editarEmpleado(id) {
+        alert('Editando empleado ID: ' + id);
+    }
+    
+    console.log('Prueba de empleados cargada');
+    </script>
+</body>
+</html>

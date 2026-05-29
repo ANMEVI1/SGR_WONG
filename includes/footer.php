@@ -1,9 +1,17 @@
+<?php
+// Detectar profundidad para rutas dinámicas
+if (!isset($baseUrl)) {
+    $currentPath = $_SERVER['PHP_SELF'];
+    $depth = substr_count(dirname($currentPath), '/');
+    $baseUrl = str_repeat('../', $depth);
+}
+?>
     <footer class="footer">
         <section  class="container footer-grid">
             
             <div class="footer-brand">
                 <div class="footer-logo-box">
-                    <img src="assets/logo_proyect.svg" alt="Logo Chifa Matsue">
+                    <img src="<?= $baseUrl ?>assets/logo_proyect.svg" alt="Logo Chifa Matsue">
                     <span>Chifa Matsue</span>
                 </div>
                 <p>La mejor comida rápida de la ciudad, preparada con ingredientes frescos y mucho amor. ¡Siente el sabor!</p>
@@ -26,14 +34,14 @@
             <div class="footer-links">
                 <h3>Enlaces Útiles</h3>
                 <ul>
-                    <li><a href="reclamaciones.php"><i class="fas fa-file-alt"></i> Libro de Reclamaciones</a></li>
+                    <li><a href="<?= $baseUrl ?>views/cliente/reclamaciones.php"><i class="fas fa-file-alt"></i> Libro de Reclamaciones</a></li>
                 </ul>
             </div>
 
             <div class="qr-section">
                 <h3>¡Ordena tu Chifa!</h3>
                 <p>Escanea el código QR</p>
-                <img src="assets/qr.png" alt="Código QR para pedidos">
+                <img src="<?= $baseUrl ?>assets/qr.png" alt="Código QR para pedidos">
             </div>
         </section>
         

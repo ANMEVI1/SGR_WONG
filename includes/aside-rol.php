@@ -1,13 +1,12 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
 require_once __DIR__ . '/../config/conexion.php';
+startSecureSession();
 
-$usuarioID = $_SESSION['usuario_id'] ?? null;
-$loginName = $_SESSION['usuario_login'] ?? $_SESSION['ingresar'] ?? '';
-$rolUsuario = $_SESSION['usuario_rol'] ?? 'cliente';
+$currentUser = getCurrentUser();
+$usuarioID = $currentUser['id'] ?? null;
+$loginName = $currentUser['login'] ?? '';
+$rolUsuario = $currentUser['rol'] ?? 'Cliente web';
+$scopeUsuario = $currentUser['scope'] ?? 'web';
 
 $profile = [
     'nombre' => '',
@@ -19,28 +18,42 @@ $profile = [
 ];
 
 if ($usuarioID) {
-    $stmt = $conexion->prepare(
+    $db = getDB();
+    
+    // Buscar primero en Cliente
+    $clienteData = $db->fetchOne(
         "SELECT Nombre_Apellidos, Tipo_Documento, Num_Documento, Telefono, Direccion, Correo
          FROM Cliente
-         WHERE UsuarioID = ?
-         LIMIT 1"
+         WHERE UsuarioID = :userId
+         LIMIT 1",
+        [':userId' => $usuarioID]
     );
 
-    if ($stmt) {
-        $stmt->bind_param('i', $usuarioID);
-        $stmt->execute();
-        $stmt->bind_result($nombreCliente, $tipoDocumento, $numDocumento, $telefono, $direccion, $correoCliente);
-
-        if ($stmt->fetch()) {
-            $profile['nombre'] = trim($nombreCliente ?: '');
-            $profile['tipoDocumento'] = $tipoDocumento ?: 'DNI';
-            $profile['documento'] = $numDocumento ?: '';
-            $profile['telefono'] = $telefono ?: '';
-            $profile['direccion'] = $direccion ?: '';
-            $profile['correo'] = $correoCliente ?: $profile['correo'];
+    if ($clienteData) {
+        $profile['nombre'] = trim($clienteData['Nombre_Apellidos'] ?: '');
+        $profile['tipoDocumento'] = $clienteData['Tipo_Documento'] ?: 'DNI';
+        $profile['documento'] = $clienteData['Num_Documento'] ?: '';
+        $profile['telefono'] = $clienteData['Telefono'] ?: '';
+        $profile['direccion'] = $clienteData['Direccion'] ?: '';
+        $profile['correo'] = $clienteData['Correo'] ?: $profile['correo'];
+    } else {
+        // Si no es cliente, buscar en Empleado
+        $empleadoData = $db->fetchOne(
+            "SELECT Nombre_Apellidos, DNI, Telefono
+             FROM Empleado
+             WHERE UsuarioID = :userId
+             LIMIT 1",
+            [':userId' => $usuarioID]
+        );
+        
+        if ($empleadoData) {
+            $profile['nombre'] = trim($empleadoData['Nombre_Apellidos'] ?: '');
+            $profile['tipoDocumento'] = 'DNI';
+            $profile['documento'] = $empleadoData['DNI'] ?: '';
+            $profile['telefono'] = $empleadoData['Telefono'] ?: '';
+            $profile['direccion'] = 'Empleado del sistema';
+            // El correo ya está en $loginName
         }
-
-        $stmt->close();
     }
 }
 
@@ -64,14 +77,15 @@ if ($displayName !== '') {
     }
 }
 
+// Determinar menú según el scope del usuario
+$isAdmin = ($scopeUsuario === 'backoffice');
+
 $menuByRole = [
     'admin' => [
         ['section' => 'datos', 'label' => 'Mis datos'],
         ['section' => 'pedidos', 'label' => 'Mis pedidos'],
-        ['section' => 'direcciones', 'label' => 'Direcciones'],
         ['section' => 'password', 'label' => 'Contraseña'],
-        ['section' => 'usuarios', 'label' => 'Usuarios'],
-        ['section' => 'reportes', 'label' => 'Reportes'],
+        ['section' => 'admin', 'label' => 'Administrar', 'admin_only' => true],
         ['section' => 'logout', 'label' => 'Cerrar sesión'],
     ],
     'cliente' => [
@@ -83,7 +97,7 @@ $menuByRole = [
     ],
 ];
 
-$menuItems = $menuByRole[$rolUsuario] ?? $menuByRole['cliente'];
+$menuItems = $isAdmin ? $menuByRole['admin'] : $menuByRole['cliente'];
 ?>
 
 <div id="modalOverlay" class="modal-overlay" aria-hidden="true">
@@ -126,6 +140,12 @@ $menuItems = $menuByRole[$rolUsuario] ?? $menuByRole['cliente'];
                                 <path d="m21 2-9.6 9.6"/>
                                 <circle cx="7.5" cy="15.5" r="5.5"/>
                                 <path d="m15 6 3 3"/>
+                            </svg>
+                        <?php elseif ($item['section'] === 'admin'): ?>
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                                <path d="M2 17l10 5 10-5"/>
+                                <path d="M2 12l10 5 10-5"/>
                             </svg>
                         <?php elseif ($item['section'] === 'usuarios'): ?>
                             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">

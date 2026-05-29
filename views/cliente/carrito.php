@@ -5,10 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carrito - Chifa Matsue</title>
-    <link rel="stylesheet" href="/css/estilos.css">
-    <link rel="stylesheet" href="/css/carrito.css">
-    <link rel="stylesheet" href="/css/header.css">
-    <link rel="stylesheet" href="/css/responsivo.css">
+    <link rel="stylesheet" href="../../css/estilos.css">
+    <link rel="stylesheet" href="../../css/carrito.css">
+    <link rel="stylesheet" href="../../css/header.css">
+    <link rel="stylesheet" href="../../css/responsivo.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,11 +29,11 @@
             <div class="resumen-line"><span>Delivery:</span> <strong>S/ 8.00</strong></div>
             <div class="resumen-total"><span>Total:</span> <strong id="total">S/ 8.00</strong></div>
             <button id="btnPagar" class="btn btn-primary btn-full">Proceder al Pago</button>
-            <a href="index.php" class="btn btn-secondary btn-full">Seguir Comprando</a>
+            <a href="../../index.php" class="btn btn-secondary btn-full">Seguir Comprando</a>
         </div>
     </main>
 <?php include ('../../includes/footer.php') ?>
-    <script src="/js/carrito.js"></script>
-    <script src="/js/sidebar.js"></script>
+    <script src="../../js/carrito.js"></script>
+    <script src="../../js/sidebar.js"></script>
 </body>
 </html>

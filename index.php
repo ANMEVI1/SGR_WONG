@@ -1,6 +1,8 @@
 <?php
-session_start();
-$cliente = $_SESSION['cliente_nom'] ?? null;
+require_once 'config/conexion.php';
+startSecureSession();
+
+$currentUser = getCurrentUser();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -11,67 +13,63 @@ $cliente = $_SESSION['cliente_nom'] ?? null;
     <title>Chifa Matsue - Menú de Chifa y Chino-Peruano</title>
     <link rel="stylesheet" href="css/estilos.css">
     <link rel="stylesheet" href="css/header.css">
-    <link rel="stylesheet" href="css/responsivo.css">
     <link rel="stylesheet" href="css/modal-perfil.css">
+    <link rel="stylesheet" href="css/responsivo.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
     <?php include 'includes/header.php';?>
     <?php include 'includes/aside-rol.php'; ?>
     <?php include 'includes/aside.php'?>
     <main>
-        <section class="hero-carousel" aria-label="Promociones destacadas">
-            <div class="carousel-container">
-                <div class="carousel-slide active">
-                    <img src="assets/logo_chifa_matsue.png" alt="Chifa Matsue - Promoción especial">
-                </div>
-                <div class="carousel-slide">
-                <video autoplay muted loop playsinline poster="assets/plato ramen.jpg">
-                    <source src="assets/plato ramen.jpg" alt="Chifa Matsue">
-                    Tu navegador no soporta videos.
-                </video>
-                </div>
-                <div class="carousel-slide">
-                    <img src="assets/ramen_IVI5301-scaled.jpg" alt="Chifa Matsue - Novedades del menú">
-                </div>
-                <div class="carousel-buttons">
-                    <a href="assets\CARTAS_MATSUE\LA_CARTA_PDF\CARTA MATSUE.pdf" class="btn-carousel"><i class="fas fa-utensils"></i> Ver la Carta</a>
-                    <a href="reservas.php" class="btn-carousel btn-reserva"><i class="fas fa-calendar-alt"></i> Hacer Reserva</a>
+
+        <!-- ===== HERO ===== -->
+        <section class="hero" style="background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('assets/ramen_IVI5301-scaled.jpg') center/cover;" aria-labelledby="hero-title">
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+                <p class="hero-eyebrow" style="color: var(--gold-light);">Cocina chino-peruana auténtica</p>
+                <h1 id="hero-title" style="color: white;">CHIFA<br>MATSUE</h1>
+                <p class="hero-subtitle" style="color: rgba(255, 255, 255, 0.8);">Tradición, sabor y calidez en cada plato</p>
+                <div class="hero-buttons">
+                    <a href="carta.php" class="btn btn-primary">
+                        <i class="fas fa-utensils"></i> VER LA CARTA
+                    </a>
+                    <a href="reservas.php" class="btn btn-secondary">
+                        HACER RESERVA
+                    </a>
                 </div>
             </div>
-            <button class="prev" aria-label="Anterior">&#10094;</button>
-            <button class="next" aria-label="Siguiente">&#10095;</button>
         </section>
 
         <!-- Top Ventas -->
         <section class="top-ventas container" id="top-ventas">
-            <h2 class="section-title">Top Ventas</h2>
-            <p class="section-subtitle">Los favoritos de nuestros clientes</p>
+            <h2 class="section-title" style="color: white;">Top Ventas</h2>
+            <p class="section-subtitle" style="color: white;">Los favoritos de nuestros clientes</p>
             <div class="mini-carousel"></div>
         </section>
 
         <!-- Promociones -->
         <section class="promociones container" id="promociones">
-            <h2 class="section-title">Promociones</h2>
-            <p class="section-subtitle">Ofertas especiales que no puedes perderte</p>
+            <h2 class="section-title" style="color: white;">Promociones</h2>
+            <p class="section-subtitle" style="color: white;">Ofertas especiales que no puedes perderte</p>
             <div class="mini-carousel"></div>
         </section>
 
         <!-- Menú Completo -->
         <section class="menu-full container" id="menu">
-            <h2 class="section-title">Menú del Chifa</h2>
-            <p class="section-subtitle">Descubre lo mejor del chifa Matsue: sopas, chaufas, tallarines y más</p>
+            <h2 class="section-title" style="color: white;">Menú del Chifa</h2>
+            <p class="section-subtitle" style="color: white;">Descubre lo mejor del chifa Matsue: sopas, chaufas, tallarines y más</p>
             <div class="menu-grid" id="menuGrid"></div>
         </section>
 
         <!-- Sobre Nosotros -->
         <section class="about">
     <div class="container">
-        <h2 class="section-title">Sobre Nosotros</h2>
-        <p class="section-subtitle">Conoce más sobre Chifa Matsue</p>
+        <h2 class="section-title" style="color: white;">Sobre Nosotros</h2>
+        <p class="section-subtitle" style="color: white;">Conoce más sobre Chifa Matsue</p>
         
         <div class="about-grid">
             
@@ -109,8 +107,8 @@ $cliente = $_SESSION['cliente_nom'] ?? null;
         <section class="location-section">
             <div class="location-container">
                 <div class="location-header">
-                    <h2 class="section-title">Ubícanos en el Mapa</h2>
-                    <p class="section-subtitle">Visítanos en nuestro local de Zorrillos</p>
+                    <h2 class="section-title" style="color: white;">Ubícanos en el Mapa</h2>
+                    <p class="section-subtitle" style="color: white;">Visítanos en nuestro local de Zorrillos</p>
                 </div>
                 <div class="location-content">
                     <div class="map-wrapper">
@@ -149,7 +147,7 @@ $cliente = $_SESSION['cliente_nom'] ?? null;
     <a href="https://wa.me/+51991183777?text=Hola,%20quiero%20hacer%20un%20pedido" target="_blank" class="whatsapp-btn" aria-label="Contactar por WhatsApp" title="Contactar por WhatsApp">
         <i class="fab fa-whatsapp"></i>
     </a>
-    <script src="js/main.js"></script>
+    <script src="js/app.js"></script>
     <script src="js/sidebar.js"></script>
     <script src="js/modal-perfil.js"></script>
 </body>

@@ -1,92 +1,116 @@
 <?php
-session_start();
 require_once '../config/conexion.php';
 
-header('Content-Type: application/json; charset=utf-8');
+startSecureSession();
+requireAuth();
 
+// Verificar que sea una petición POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo json_encode(['success' => false, 'message' => 'Método no permitido.']);
-    exit;
+    Response::error('Método no permitido', 405);
 }
 
-if (empty($_SESSION['usuario_id'])) {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'message' => 'Sesión expirada. Inicia sesión de nuevo.']);
-    exit;
+$currentUser = getCurrentUser();
+if (!$currentUser) {
+    Response::unauthorized('Sesión expirada');
 }
 
-$usuarioID = (int) $_SESSION['usuario_id'];
-$nombre = trim($_POST['nombre_completo'] ?? '');
-$correo = trim($_POST['correo'] ?? '');
-$tipoDocumento = trim($_POST['tipo_documento'] ?? 'DNI');
-$numDocumento = trim($_POST['nmr_documento'] ?? '');
-$telefono = trim($_POST['telefono'] ?? '');
-$direccion = trim($_POST['direccion'] ?? '');
+// Obtener y sanitizar datos
+$data = Validator::sanitizeArray([
+    'nombre' => $_POST['nombre_completo'] ?? '',
+    'correo' => $_POST['correo'] ?? '',
+    'tipo_documento' => $_POST['tipo_documento'] ?? 'DNI',
+    'nmr_documento' => $_POST['nmr_documento'] ?? '',
+    'telefono' => $_POST['telefono'] ?? '',
+    'direccion' => $_POST['direccion'] ?? ''
+]);
 
-if ($nombre === '' || $correo === '') {
-    echo json_encode(['success' => false, 'message' => 'Nombre y correo son obligatorios.']);
-    exit;
+// Validar datos
+$validator = new Validator();
+$validator
+    ->required('nombre', $data['nombre'], 'El nombre es requerido')
+    ->maxLength('nombre', $data['nombre'], 100, 'El nombre no puede exceder 100 caracteres')
+    ->required('correo', $data['correo'], 'El correo es requerido')
+    ->email('correo', $data['correo'], 'Ingresa un correo válido')
+    ->required('telefono', $data['telefono'], 'El teléfono es requerido')
+    ->phone('telefono', $data['telefono'], 'Ingresa un teléfono válido');
+
+// Validar documento si se proporciona
+if (!empty($data['nmr_documento'])) {
+    $documento = preg_replace('/[^0-9]/', '', $data['nmr_documento']);
+    if ($data['tipo_documento'] === 'DNI') {
+        $validator->dni('nmr_documento', $documento);
+    } elseif ($data['tipo_documento'] === 'RUC') {
+        $validator->ruc('nmr_documento', $documento);
+    }
+    $data['nmr_documento'] = $documento;
 }
 
-if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
-    echo json_encode(['success' => false, 'message' => 'Correo inválido.']);
-    exit;
+if ($validator->hasErrors()) {
+    Response::validation($validator->getErrors());
 }
 
 try {
-    $dsn = "mysql:host={$host};dbname={$database};charset=utf8mb4";
-    $pdo = new PDO($dsn, $user, $password, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ]);
-
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM Usuario WHERE Login = :login AND UsuarioID != :usuarioID");
-    $stmt->execute([
-        ':login' => $correo,
-        ':usuarioID' => $usuarioID,
-    ]);
-
-    if ($stmt->fetchColumn() > 0) {
-        echo json_encode(['success' => false, 'message' => 'Ya existe otra cuenta con ese correo.']);
-        exit;
+    $db = getDB();
+    
+    // Verificar si el email ya existe (si es diferente al actual)
+    if ($data['correo'] !== $currentUser['login']) {
+        $existingUser = $db->fetchOne(
+            "SELECT COUNT(*) as count FROM Usuario WHERE Login = :correo AND UsuarioID != :userId",
+            [':correo' => $data['correo'], ':userId' => $currentUser['id']]
+        );
+        
+        if ($existingUser['count'] > 0) {
+            Response::error('Ya existe otra cuenta con ese correo', 422);
+        }
     }
-
-    $pdo->beginTransaction();
-
-    $stmt = $pdo->prepare("UPDATE Usuario SET Login = :login WHERE UsuarioID = :usuarioID");
-    $stmt->execute([
-        ':login' => $correo,
-        ':usuarioID' => $usuarioID,
-    ]);
-
-    $stmt = $pdo->prepare(
-        "UPDATE Cliente SET Nombre_Apellidos = :nombre, Tipo_Documento = :tipoDocumento,
-                Num_Documento = :numDocumento, Telefono = :telefono,
-                Direccion = :direccion, Correo = :correo
-         WHERE UsuarioID = :usuarioID"
-    );
-
-    $stmt->execute([
-        ':nombre' => $nombre,
-        ':tipoDocumento' => $tipoDocumento,
-        ':numDocumento' => $numDocumento,
-        ':telefono' => $telefono,
-        ':direccion' => $direccion,
-        ':correo' => $correo,
-        ':usuarioID' => $usuarioID,
-    ]);
-
-    $pdo->commit();
-    $_SESSION['usuario_login'] = $correo;
-
-    echo json_encode(['success' => true, 'message' => 'Tus datos se actualizaron correctamente.']);
-    exit;
-} catch (PDOException $e) {
-    if (isset($pdo) && $pdo->inTransaction()) {
-        $pdo->rollBack();
+    
+    // Iniciar transacción
+    $db->beginTransaction();
+    
+    try {
+        // Actualizar Usuario
+        $db->execute(
+            "UPDATE Usuario SET Login = :correo WHERE UsuarioID = :userId",
+            [':correo' => $data['correo'], ':userId' => $currentUser['id']]
+        );
+        
+        // Actualizar Cliente
+        $db->execute(
+            "UPDATE Cliente SET 
+                Nombre_Apellidos = :nombre,
+                Tipo_Documento = :tipoDoc,
+                Num_Documento = :numDoc,
+                Telefono = :telefono,
+                Direccion = :direccion,
+                Correo = :correo
+             WHERE UsuarioID = :userId",
+            [
+                ':nombre' => $data['nombre'],
+                ':tipoDoc' => $data['tipo_documento'],
+                ':numDoc' => $data['nmr_documento'],
+                ':telefono' => $data['telefono'],
+                ':direccion' => $data['direccion'],
+                ':correo' => $data['correo'],
+                ':userId' => $currentUser['id']
+            ]
+        );
+        
+        $db->commit();
+        
+        // Actualizar sesión si cambió el email
+        if ($data['correo'] !== $currentUser['login']) {
+            $_SESSION['usuario_login'] = $data['correo'];
+        }
+        
+        Response::success([], 'Tus datos se actualizaron correctamente');
+        
+    } catch (Exception $e) {
+        $db->rollback();
+        throw $e;
     }
-    error_log('Actualizar perfil PDO error: ' . $e->getMessage());
-    echo json_encode(['success' => false, 'message' => 'Error al guardar el perfil. Intenta de nuevo más tarde.']);
-    exit;
+    
+} catch (Exception $e) {
+    error_log('Error updating profile: ' . $e->getMessage());
+    Response::error('Error al guardar el perfil. Intenta de nuevo más tarde');
 }
+?>

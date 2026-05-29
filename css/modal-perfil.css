@@ -43,15 +43,6 @@ html, body {
   padding: 0;
 }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background: var(--gray-50);
-  color: var(--gray-800);
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-
 button,
 input,
 select {
@@ -105,7 +96,7 @@ button {
 }
 
 .search:focus-within {
-  background: #fff;
+  background: url('../assets/LOGO_7.jpg') center center / cover no-repeat, var(--gray-100);
   border-color: var(--gray-200);
   box-shadow: var(--shadow-sm);
   transform: translateY(-1px);

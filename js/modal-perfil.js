@@ -26,6 +26,23 @@ document.addEventListener("DOMContentLoaded", () => {
     direccion: profileData.direccion || "Av. Siempre Viva 742",
   };
 
+  const locationPath = window.location.pathname;
+  let appRoot = '/';
+
+  if (locationPath.includes('/views/')) {
+    appRoot = locationPath.split('/views/')[0] || '/';
+  } else if (locationPath.endsWith('/index.php')) {
+    appRoot = locationPath.replace(/\/index\.php$/, '') || '/';
+  } else {
+    appRoot = locationPath.substring(0, locationPath.lastIndexOf('/') + 1) || '/';
+  }
+
+  if (!appRoot.endsWith('/')) {
+    appRoot += '/';
+  }
+
+  const adminBase = `${appRoot}views/admin`;
+
   const sections = {
     datos: () => `
       <div class="section-head">
@@ -131,6 +148,58 @@ document.addEventListener("DOMContentLoaded", () => {
       performLogout();
       return `<div class="empty-state">Cerrando sesión…</div>`;
     },
+    admin: () => `
+      <div class="section-head">
+        <div>
+          <h2>Panel de Administración</h2>
+          <p>Gestiona el sistema del restaurante</p>
+        </div>
+      </div>
+      <div class="admin-actions">
+        <a href="${adminBase}/dashboard.php" class="admin-card">
+          <div class="admin-icon">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9,22 9,12 15,12 15,22"/>
+            </svg>
+          </div>
+          <h3>Dashboard</h3>
+          <p>Vista general del sistema</p>
+        </a>
+        <a href="${adminBase}/usuarios/index.php" class="admin-card">
+          <div class="admin-icon">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="9" cy="8" r="4"/>
+              <path d="M17 11a3 3 0 1 0 0-6"/>
+              <path d="M2 21a7 7 0 0 1 14 0"/>
+            </svg>
+          </div>
+          <h3>Usuarios</h3>
+          <p>Gestionar usuarios del sistema</p>
+        </a>
+        <a href="${adminBase}/menu/index.php" class="admin-card">
+          <div class="admin-icon">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
+              <path d="M3 6h18"/>
+              <path d="M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+          </div>
+          <h3>Menú</h3>
+          <p>Administrar platos y categorías</p>
+        </a>
+        <a href="${adminBase}/pedidos/index.php" class="admin-card">
+          <div class="admin-icon">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 6v6l4 2"/>
+            </svg>
+          </div>
+          <h3>Pedidos</h3>
+          <p>Gestionar pedidos activos</p>
+        </a>
+      </div>
+    `,
   };
 
   function render(section) {
@@ -350,6 +419,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "Escape" && overlay.classList.contains("open")) closeModal();
   });
   menuItems.forEach((item) => {
-    item.addEventListener("click", () => render(item.dataset.section));
+    if (item.dataset.section === "admin") {
+      item.addEventListener("click", () => {
+        window.location.href = `${adminBase}/dashboard.php`;
+      });
+    } else {
+      item.addEventListener("click", () => render(item.dataset.section));
+    }
   });
 });

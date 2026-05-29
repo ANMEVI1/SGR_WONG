@@ -1,40 +1,46 @@
 <?php
-session_start();
 require_once '../config/conexion.php';
 
-if (!isset($_POST['ingresar'])) {
+startSecureSession();
+
+// Verificar que sea una petición POST válida
+if (!isset($_POST['ingresar']) || $_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: ../login.php');
     exit;
 }
 
-$email = trim($_POST['correo'] ?? '');
+// Obtener y sanitizar datos
+$email = Validator::sanitize($_POST['correo'] ?? '');
 $passwordInput = $_POST['pass'] ?? '';
 
-if ($email === '' || $passwordInput === '') {
+// Validar datos
+$validator = new Validator();
+$validator
+    ->required('correo', $email, 'El correo es requerido')
+    ->email('correo', $email, 'Ingresa un correo válido')
+    ->required('pass', $passwordInput, 'La contraseña es requerida');
+
+if ($validator->hasErrors()) {
+    $errors = implode('\n', $validator->getErrors());
     echo "<script>
-            alert('Debes ingresar correo y contraseña.');
+            alert('{$errors}');
             window.location='../login.php';
           </script>";
     exit;
 }
 
 try {
-    $dsn = "mysql:host={$host};dbname={$database};charset=utf8mb4";
-    $pdo = new PDO($dsn, $user, $password, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ]);
-
+    $db = getDB();
+    
+    // Consulta para obtener usuario
     $sql = "SELECT u.UsuarioID, u.Login, u.Contrasena, u.Estado, u.TipUsuID,
                    t.Descripcion AS RolDescripcion, t.Scope AS RolScope
             FROM Usuario u
             JOIN Tipo_Usuario t ON u.TipUsuID = t.TipUsuID
-            WHERE u.Login = :login
+            WHERE u.Login = :login AND u.Estado = 'Activo'
             LIMIT 1";
 
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([':login' => $email]);
-    $usuario = $stmt->fetch();
+    $usuario = $db->fetchOne($sql, [':login' => $email]);
 
     if (!$usuario) {
         echo "<script>
@@ -44,14 +50,7 @@ try {
         exit;
     }
 
-    if ($usuario['Estado'] !== 'Activo') {
-        echo "<script>
-                alert('Tu cuenta no está activa. Contacta al administrador.');
-                window.location='../login.php';
-              </script>";
-        exit;
-    }
-
+    // Verificar contraseña
     if (!password_verify($passwordInput, $usuario['Contrasena'])) {
         echo "<script>
                 alert('Correo o contraseña incorrectos.');
@@ -60,22 +59,27 @@ try {
         exit;
     }
 
-    // Exitoso: guardamos información mínima en sesión
+    // Regenerar ID de sesión por seguridad
+    session_regenerate_id(true);
+    
+    // Guardar información en sesión
     $_SESSION['usuario_id'] = $usuario['UsuarioID'];
     $_SESSION['usuario_login'] = $usuario['Login'];
     $_SESSION['usuario_rol_id'] = $usuario['TipUsuID'];
     $_SESSION['usuario_rol'] = $usuario['RolDescripcion'];
     $_SESSION['usuario_scope'] = $usuario['RolScope'];
+    $_SESSION['login_time'] = time();
 
+    // Redireccionar según el rol
     if ($usuario['RolScope'] === 'backoffice') {
-        header('Location: ../admin_web.php');
+        header('Location: ../views/admin/menu/index.php');
     } else {
         header('Location: ../index.php');
     }
     exit;
 
-} catch (PDOException $e) {
-    error_log('Login PDO error: ' . $e->getMessage());
+} catch (Exception $e) {
+    error_log('Login error: ' . $e->getMessage());
     echo "<script>
             alert('Error de conexión. Intenta de nuevo más tarde.');
             window.location='../login.php';

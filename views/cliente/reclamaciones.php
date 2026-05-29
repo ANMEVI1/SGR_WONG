@@ -5,33 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Libro de Reclamaciones - Chifa Matsue</title>
-    <?php include ('includes/links_head.php') ?>
+    <link rel="stylesheet" href="../../css/estilos.css">
+    <link rel="stylesheet" href="../../css/header.css">
+    <link rel="stylesheet" href="../../css/reclamaciones.css">
+    <link rel="stylesheet" href="../../css/responsivo.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header class="header">
-        <section class="container header-container">
-            <a href="index.html" class="logo">
-                <img src="assets/logo_proyect.svg" alt="Logo Chifa Matsue"><span>Chifa Matsue</span>
-            </a>
-            <div class="header-right">
-                <div class="search-bar">
-                    <input type="text" id="searchInput" placeholder="Buscar plato..." aria-label="Buscar plato">
-                    <i class="fas fa-search"></i>
-                    <div class="search-results" id="searchResults" role="listbox"></div>
-                </div>
-                <div class="cart-icon">
-                    <a href="carrito.html" aria-label="Ver carrito">
-                        <i class="fas fa-shopping-cart"></i><span id="cartCount">0</span>
-                    </a>
-                </div>
-                <div class="user-icon">
-                    <a href="login.html">
-                        <i class="fas fa-user"></i><span class="user-text">Iniciar sesión</span>
-                    </a>
-                </div>
-            </div>
-        </section>
-    </header>
+    <?php include ('../../includes/header.php'); ?>
+    <?php include ('../../includes/aside.php'); ?>
+    
     <main class="container reclamaciones-section">
         <h1 class="section-title">Libro de Reclamaciones</h1>
         <div class="reclamaciones-form">
@@ -59,6 +45,6 @@
             </form>
         </div>
     </main>
-<?php include ('includes/footer.php') ?>
+<?php include ('../../includes/footer.php') ?>
 </body>
 </html>

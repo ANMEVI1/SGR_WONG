@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba - Gestión de Proveedores</title>
+    <link rel="stylesheet" href="../../../css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <div style="padding: 20px;">
+        <h1><i class="fas fa-truck"></i> Prueba - Gestión de Proveedores</h1>
+        
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+            <h3>Características del Sistema de Proveedores:</h3>
+            <ul>
+                <li>✅ CRUD completo de proveedores</li>
+                <li>✅ Validación de RUC (11 dígitos)</li>
+                <li>✅ Filtros por estado (Activo/Inactivo)</li>
+                <li>✅ Filtros por tipo de producto</li>
+                <li>✅ Filtros por movimientos (con/sin compras)</li>
+                <li>✅ Búsqueda por razón social, RUC o contacto</li>
+                <li>✅ Estadísticas de proveedores</li>
+                <li>✅ Exportación a CSV</li>
+                <li>✅ Integración con tabla Kardex (movimientos)</li>
+                <li>✅ Activar/Desactivar proveedores</li>
+            </ul>
+        </div>
+        
+        <!-- Filtros -->
+        <div style="display: flex; gap: 15px; margin: 20px 0;">
+            <select id="filtroEstado" class="form-control" style="width: 150px;">
+                <option value="">Todos los estados</option>
+                <option value="A">Activos</option>
+                <option value="I">Inactivos</option>
+            </select>
+            <select id="filtroTipoProducto" class="form-control" style="width: 200px;">
+                <option value="">Todos los productos</option>
+                <option value="Abarrotes y salsas">Abarrotes y salsas</option>
+                <option value="Carnes y aves">Carnes y aves</option>
+                <option value="Mariscos frescos">Mariscos frescos</option>
+                <option value="Verduras">Verduras</option>
+            </select>
+            <select id="filtroMovimientos" class="form-control" style="width: 180px;">
+                <option value="">Todos</option>
+                <option value="con_movimientos">Con movimientos</option>
+                <option value="sin_movimientos">Sin movimientos</option>
+            </select>
+            <input type="text" id="buscarProveedor" placeholder="Buscar proveedor..." class="form-control" style="width: 300px;">
+            <button onclick="limpiarFiltros()" class="btn btn-outline">
+                <i class="fas fa-times"></i> Limpiar
+            </button>
+        </div>
+        
+        <!-- Contador -->
+        <div style="margin-bottom: 15px; color: #666; font-size: 0.9rem;">
+            <span id="proveedores-counter">Cargando...</span>
+        </div>
+        
+        <!-- Tabla -->
+        <div class="admin-table">
+            <table id="tablaProveedores">
+                <thead>
+                    <tr>
+                        <th>Proveedor</th>
+                        <th>RUC</th>
+                        <th>Contacto</th>
+                        <th>Tipo de Producto</th>
+                        <th>Movimientos</th>
+                        <th>Total Compras</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Proveedor activo con movimientos -->
+                    <tr data-estado="A" data-tipo-producto="Abarrotes y salsas" data-movimientos="con_movimientos">
+                        <td>
+                            <strong>Distribuidora Wong SAC</strong><br>
+                            <small style="color: #6c757d;">ID: 1 | Av. Comercio 100, Tumbes</small>
+                        </td>
+                        <td>20411234567</td>
+                        <td>
+                            <strong>Sr. Wong</strong><br>
+                            <i class="fas fa-phone" style="color: #28a745;"></i> 072-123456<br>
+                            <i class="fas fa-envelope" style="color: #17a2b8;"></i> ventas@wongdist.com
+                        </td>
+                        <td>
+                            <span class="badge badge-info">Abarrotes y salsas</span>
+                        </td>
+                        <td>
+                            <span class="badge badge-success">15</span><br>
+                            <small style="color: #6c757d;">Última: 15/12/2024</small>
+                        </td>
+                        <td>S/ 2,450.75</td>
+                        <td>
+                            <span class="badge badge-success">Activo</span>
+                        </td>
+                    </tr>
+                    
+                    <!-- Proveedor activo con movimientos -->
+                    <tr data-estado="A" data-tipo-producto="Carnes y aves" data-movimientos="con_movimientos">
+                        <td>
+                            <strong>Avícola Los Andes EIRL</strong><br>
+                            <small style="color: #6c757d;">ID: 2 | Mercado Central, Tumbes</small>
+                        </td>
+                        <td>20522345678</td>
+                        <td>
+                            <strong>Sra. Quispe</strong><br>
+                            <i class="fas fa-phone" style="color: #28a745;"></i> 072-234567<br>
+                            <i class="fas fa-envelope" style="color: #17a2b8;"></i> alosandes@mail.com
+                        </td>
+                        <td>
+                            <span class="badge badge-info">Carnes y aves</span>
+                        </td>
+                        <td>
+                            <span class="badge badge-success">8</span><br>
+                            <small style="color: #6c757d;">Última: 18/12/2024</small>
+                        </td>
+                        <td>S/ 1,890.50</td>
+                        <td>
+                            <span class="badge badge-success">Activo</span>
+                        </td>
+                    </tr>
+                    
+                    <!-- Proveedor activo con movimientos -->
+                    <tr data-estado="A" data-tipo-producto="Mariscos frescos" data-movimientos="con_movimientos">
+                        <td>
+                            <strong>Mariscos del Norte SAC</strong><br>
+                            <small style="color: #6c757d;">ID: 3 | Puerto Pesquero, Tumbes</small>
+                        </td>
+                        <td>20633456789</td>
+                        <td>
+                            <strong>Sr. Torres</strong><br>
+                            <i class="fas fa-phone" style="color: #28a745;"></i> 072-345678<br>
+                            <i class="fas fa-envelope" style="color: #17a2b8;"></i> mnorte@mail.com
+                        </td>
+                        <td>
+                            <span class="badge badge-info">Mariscos frescos</span>
+                        </td>
+                        <td>
+                            <span class="badge badge-success">5</span><br>
+                            <small style="color: #6c757d;">Última: 10/12/2024</small>
+                        </td>
+                        <td>S/ 980.25</td>
+                        <td>
+                            <span class="badge badge-success">Activo</span>
+                        </td>
+                    </tr>
+                    
+                    <!-- Proveedor activo sin movimientos -->
+                    <tr data-estado="A" data-tipo-producto="Verduras" data-movimientos="sin_movimientos">
+                        <td>
+                            <strong>Verduras Frescas SAC</strong><br>
+                            <small style="color: #6c757d;">ID: 4 | Mercado Mayorista, Tumbes</small>
+                        </td>
+                        <td>20744567890</td>
+                        <td>
+                            <strong>Sra. García</strong><br>
+                            <i class="fas fa-phone" style="color: #28a745;"></i> 072-456789
+                        </td>
+                        <td>
+                            <span class="badge badge-info">Verduras</span>
+                        </td>
+                        <td>
+                            <span class="badge badge-secondary">0</span>
+                        </td>
+                        <td>S/ 0.00</td>
+                        <td>
+                            <span class="badge badge-success">Activo</span>
+                        </td>
+                    </tr>
+                    
+                    <!-- Proveedor inactivo -->
+                    <tr data-estado="I" data-tipo-producto="Abarrotes y salsas" data-movimientos="sin_movimientos">
+                        <td>
+                            <strong>Distribuidora Antigua EIRL</strong><br>
+                            <small style="color: #6c757d;">ID: 5 | Calle Vieja 123, Tumbes</small>
+                        </td>
+                        <td>20855678901</td>
+                        <td>
+                            <strong>Sr. Pérez</strong><br>
+                            <i class="fas fa-phone" style="color: #28a745;"></i> 072-567890
+                        </td>
+                        <td>
+                            <span class="badge badge-info">Abarrotes y salsas</span>
+                        </td>
+                        <td>
+                            <span class="badge badge-secondary">0</span>
+                        </td>
+                        <td>S/ 0.00</td>
+                        <td>
+                            <span class="badge badge-danger">Inactivo</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Log de pruebas -->
+        <div style="background: #2c3e50; color: white; padding: 20px; border-radius: 8px; font-family: monospace; margin-top: 30px;">
+            <h4><i class="fas fa-terminal"></i> Log de Pruebas</h4>
+            <div id="log" style="max-height: 200px; overflow-y: auto;"></div>
+            <button onclick="ejecutarPruebasProveedores()" class="btn btn-primary" style="margin-top: 10px;">
+                <i class="fas fa-play"></i> Ejecutar Pruebas de Proveedores
+            </button>
+        </div>
+    </div>
+
+    <script src="../../../js/table-filters.js"></script>
+    <script>
+    let proveedorFilter;
+    let logDiv = document.getElementById('log');
+    
+    function log(mensaje) {
+        const timestamp = new Date().toLocaleTimeString();
+        logDiv.innerHTML += `<div>[${timestamp}] ${mensaje}</div>`;
+        logDiv.scrollTop = logDiv.scrollHeight;
+        console.log(mensaje);
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        log('🚀 Inicializando sistema de proveedores...');
+        
+        // Inicializar sistema de filtros personalizado para proveedores
+        proveedorFilter = new TableFilter('tablaProveedores', {
+            searchInput: 'buscarProveedor',
+            filters: [
+                { id: 'filtroEstado', attribute: 'data-estado' },
+                { id: 'filtroTipoProducto', attribute: 'data-tipo-producto' },
+                { id: 'filtroMovimientos', attribute: 'data-movimientos' }
+            ],
+            onFilter: function(stats) {
+                document.getElementById('proveedores-counter').textContent = `${stats.visible} de ${stats.total} proveedores`;
+                log(`🔍 Proveedores filtrados: ${stats.visible}/${stats.total}`);
+            }
+        });
+        
+        // Mostrar contador inicial
+        const stats = proveedorFilter.getStats();
+        document.getElementById('proveedores-counter').textContent = `${stats.total} proveedores registrados`;
+        
+        log('✅ Sistema de filtros de proveedores inicializado');
+    });
+
+    function limpiarFiltros() {
+        if (proveedorFilter) {
+            proveedorFilter.clearFilters();
+        }
+        log('🧹 Filtros de proveedores limpiados');
+    }
+    
+    function ejecutarPruebasProveedores() {
+        log('🧪 === INICIANDO PRUEBAS DE PROVEEDORES ===');
+        
+        // Prueba 1: Filtrar por estado "Activos"
+        log('📋 Prueba 1: Filtrar proveedores "Activos"');
+        document.getElementById('filtroEstado').value = 'A';
+        proveedorFilter.filter();
+        
+        setTimeout(() => {
+            // Prueba 2: Filtrar por tipo de producto
+            log('📋 Prueba 2: Filtrar por "Carnes y aves"');
+            document.getElementById('filtroTipoProducto').value = 'Carnes y aves';
+            proveedorFilter.filter();
+            
+            setTimeout(() => {
+                // Prueba 3: Buscar proveedor específico
+                log('🔍 Prueba 3: Buscar "Wong" en proveedores');
+                document.getElementById('buscarProveedor').value = 'Wong';
+                proveedorFilter.filter();
+                
+                setTimeout(() => {
+                    // Prueba 4: Limpiar filtros
+                    log('🧹 Prueba 4: Limpiar todos los filtros');
+                    limpiarFiltros();
+                    
+                    setTimeout(() => {
+                        // Prueba 5: Filtrar proveedores con movimientos
+                        log('📋 Prueba 5: Filtrar "Con movimientos"');
+                        document.getElementById('filtroMovimientos').value = 'con_movimientos';
+                        proveedorFilter.filter();
+                        
+                        setTimeout(() => {
+                            // Prueba 6: Filtrar por RUC
+                            log('🔍 Prueba 6: Buscar por RUC "20411"');
+                            document.getElementById('buscarProveedor').value = '20411';
+                            proveedorFilter.filter();
+                            
+                            setTimeout(() => {
+                                // Prueba 7: Filtrar inactivos
+                                log('📋 Prueba 7: Filtrar proveedores "Inactivos"');
+                                document.getElementById('buscarProveedor').value = '';
+                                document.getElementById('filtroEstado').value = 'I';
+                                proveedorFilter.filter();
+                                
+                                setTimeout(() => {
+                                    // Prueba 8: Filtrar sin movimientos
+                                    log('📋 Prueba 8: Filtrar "Sin movimientos"');
+                                    document.getElementById('filtroEstado').value = '';
+                                    document.getElementById('filtroMovimientos').value = 'sin_movimientos';
+                                    proveedorFilter.filter();
+                                    
+                                    setTimeout(() => {
+                                        // Limpiar todo
+                                        log('🧹 Prueba final: Limpiar todos los filtros');
+                                        limpiarFiltros();
+                                        
+                                        log('✅ === PRUEBAS DE PROVEEDORES COMPLETADAS ===');
+                                    }, 1000);
+                                }, 1000);
+                            }, 1000);
+                        }, 1000);
+                    }, 1000);
+                }, 1000);
+            }, 1000);
+        }, 1000);
+    }
+    </script>
+</body>
+</html>

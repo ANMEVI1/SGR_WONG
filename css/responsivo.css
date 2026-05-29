@@ -6,14 +6,6 @@
         grid-template-columns: 2fr 1fr 1fr 1fr;
         gap: 40px;
     }
-
-    .header-right {
-        gap: 20px;
-    }
-
-    .search-bar {
-        max-width: 250px;
-    }
 }
 
 /* Tablet (992px and below) */
@@ -45,10 +37,6 @@
         grid-column: 1 / -1;
     }
 
-    .search-bar {
-        max-width: 220px;
-    }
-
     .section-title {
         font-size: 2.4rem;
     }
@@ -60,22 +48,10 @@
     .container {
         padding: 0 20px;
     }
-
-    .header-container {
-        padding: 0 20px;
-    }
 }
 
 /* Mobile Large (768px and below) */
 @media (max-width: 768px) {
-    .header-right .search-bar {
-        display: none;
-    }
-
-    .user-text {
-        display: none;
-    }
-
     .carousel-caption {
         padding: 24px 32px;
         bottom: 20%;
@@ -170,10 +146,6 @@
 
 /* Mobile Small (480px and below) */
 @media (max-width: 480px) {
-    .logo span {
-        font-size: 1.5rem;
-    }
-
     .sidebar {
         width: 100%;
         left: -100%;
@@ -248,10 +220,6 @@
     }
 
     .container {
-        padding: 0 15px;
-    }
-
-    .header-container {
         padding: 0 15px;
     }
 
