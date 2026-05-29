@@ -37,6 +37,10 @@ $cliente = $_SESSION['cliente_nom'] ?? null;
                 <div class="carousel-slide">
                     <img src="assets/ramen_IVI5301-scaled.jpg" alt="Chifa Matsue - Novedades del menú">
                 </div>
+                <div class="carousel-buttons">
+                    <a href="assets\CARTAS_MATSUE\LA_CARTA_PDF\CARTA MATSUE.pdf" class="btn-carousel"><i class="fas fa-utensils"></i> Ver la Carta</a>
+                    <a href="reservas.php" class="btn-carousel btn-reserva"><i class="fas fa-calendar-alt"></i> Hacer Reserva</a>
+                </div>
             </div>
             <button class="prev" aria-label="Anterior">&#10094;</button>
             <button class="next" aria-label="Siguiente">&#10095;</button>
