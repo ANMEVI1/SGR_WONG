@@ -11,11 +11,12 @@ $db = getDB();
 // Obtener pedidos con información completa
 $pedidos = $db->fetchAll(
     "SELECT p.PedidoID, p.Origen, p.Estado, p.Tipo_Pedido, p.Fecha_Hora,
-            p.Total, p.Observaciones,
+            p.Observaciones,
             COALESCE(m.Codigo_Mesa, 'DELIVERY') as Mesa,
             COALESCE(c.Nombre_Apellidos, 'Cliente Anónimo') as Cliente,
             COALESCE(c.Telefono, 'Sin teléfono') as Telefono,
-            COUNT(dp.DetalleID) as CantidadItems
+            COUNT(dp.DetPedID) as CantidadItems,
+            COALESCE(SUM(dp.Subtotal), 0) as Total
      FROM Pedido p
      LEFT JOIN Mesa m ON p.MesaID = m.MesaID
      LEFT JOIN Cliente c ON p.ClienteID = c.ClienteID
@@ -41,58 +42,7 @@ $estados = ['Pendiente', 'En Cocina', 'Listo', 'Entregado', 'Cancelado'];
 <body>
     <div class="admin-container">
         <!-- Sidebar -->
-        <div class="admin-sidebar">
-            <div style="padding: 25px; border-bottom: 2px solid var(--admin-border);">
-                <h3 style="margin: 0; color: var(--admin-text); display: flex; align-items: center; gap: 12px;">
-                    <i class="fas fa-utensils" style="color: var(--admin-primary); font-size: 1.5rem;"></i>
-                    Chifa Matsue
-                </h3>
-                <small style="color: var(--admin-text-light); font-weight: 600; margin-top: 5px; display: block;">Panel de Administración</small>
-            </div>
-            <nav class="admin-nav" style="padding: 25px 0;">
-                <a href="../dashboard.php" class="nav-item">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard
-                </a>
-                
-                <!-- PUNTO DE VENTA -->
-                <div class="nav-section">
-                    <div class="nav-section-title">PUNTO DE VENTA</div>
-                    <a href="../pos/caja.php" class="nav-item">
-                        <i class="fas fa-cash-register"></i> Caja
-                    </a>
-                    <a href="index.php" class="nav-item active">
-                        <i class="fas fa-shopping-cart"></i> Pedidos
-                    </a>
-                </div>
-                
-                <!-- GESTIÓN DEL NEGOCIO -->
-                <div class="nav-section">
-                    <div class="nav-section-title">GESTIÓN DEL NEGOCIO</div>
-                    <a href="../menu/index.php" class="nav-item">
-                        <i class="fas fa-utensils"></i> Menú
-                    </a>
-                    <a href="../usuarios/index.php" class="nav-item">
-                        <i class="fas fa-user-tie"></i> Empleados
-                    </a>
-                    <a href="../reportes/index.php" class="nav-item">
-                        <i class="fas fa-chart-line"></i> Reportes
-                    </a>
-                </div>
-                
-                <!-- INVENTARIO -->
-                <div class="nav-section">
-                    <div class="nav-section-title">INVENTARIO</div>
-                    <a href="../inventario/index.php" class="nav-item">
-                        <i class="fas fa-boxes"></i> Stock
-                    </a>
-                </div>
-                
-                <hr style="margin: 25px 20px; border: none; border-top: 1px solid var(--admin-border);">
-                <a href="../../../index.php" class="nav-item">
-                    <i class="fas fa-home"></i> Volver al Sitio
-                </a>
-            </nav>
-        </div>
+        <?php include '../components/sidebar.php'; ?>
 
         <!-- Contenido Principal -->
         <main class="admin-content">

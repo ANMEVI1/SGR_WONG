@@ -9,33 +9,32 @@ if (empty($_SESSION['usuario_id']) || ($_SESSION['usuario_scope'] ?? '') !== 'ba
 
 require_once __DIR__ . '/../../../config/conexion.php';
 
+$db = getDB();
 $platoID  = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $esEditar = $platoID > 0;
 $plato    = null;
 $variantes = [];
 
 if ($esEditar) {
-    $stmt = $conexion->prepare(
+    $plato = $db->fetchOne(
         "SELECT pl.*, cat.Nombre AS Categoria
         FROM Plato pl JOIN Categoria cat ON pl.CatID = cat.CatID
-        WHERE pl.PlatoID = ? LIMIT 1"
+        WHERE pl.PlatoID = :id LIMIT 1",
+        [':id' => $platoID]
     );
-    $stmt->bind_param('i', $platoID);
-    $stmt->execute();
-    $plato = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
 
     if (!$plato) { header('Location: index.php'); exit; }
 
-    $stmt = $conexion->prepare("SELECT * FROM Plato_Variante WHERE PlatoID = ? ORDER BY Precio_Venta ASC");
-    $stmt->bind_param('i', $platoID);
-    $stmt->execute();
-    $variantes = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-    $stmt->close();
+    $variantes = $db->fetchAll(
+        "SELECT * FROM Plato_Variante WHERE PlatoID = :id ORDER BY Precio_Venta ASC",
+        [':id' => $platoID]
+    );
 }
 
 // Categorías disponibles
-$categorias = $conexion->query("SELECT CatID, Nombre FROM Categoria WHERE Tipo = 'Plato' ORDER BY Nombre")->fetch_all(MYSQLI_ASSOC);
+$categorias = $db->fetchAll(
+    "SELECT CatID, Nombre FROM Categoria WHERE Tipo = 'Plato' ORDER BY Nombre"
+);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -71,66 +70,7 @@ $categorias = $conexion->query("SELECT CatID, Nombre FROM Categoria WHERE Tipo =
 <body>
 <div class="admin-container">
     <!-- Sidebar -->
-    <div class="admin-sidebar">
-        <div style="padding: 25px; border-bottom: 2px solid var(--admin-border);">
-            <h3 style="margin: 0; color: var(--admin-text); display: flex; align-items: center; gap: 12px;">
-                <i class="fas fa-utensils" style="color: var(--admin-primary); font-size: 1.5rem;"></i>
-                Chifa Matsue
-            </h3>
-            <small style="color: var(--admin-text-light); font-weight: 600; margin-top: 5px; display: block;">Panel de Administración</small>
-        </div>
-        <nav class="admin-nav" style="padding: 25px 0;">
-            <a href="../dashboard.php" class="nav-item">
-                <i class="fas fa-tachometer-alt"></i> Dashboard
-            </a>
-            
-            <!-- PUNTO DE VENTA -->
-            <div class="nav-section">
-                <div class="nav-section-title">PUNTO DE VENTA</div>
-                <a href="../pos/caja.php" class="nav-item">
-                    <i class="fas fa-cash-register"></i> Caja
-                </a>
-                <a href="../pedidos/index.php" class="nav-item">
-                    <i class="fas fa-shopping-cart"></i> Pedidos
-                </a>
-            </div>
-            
-            <!-- GESTIÓN DEL NEGOCIO -->
-            <div class="nav-section">
-                <div class="nav-section-title">GESTIÓN DEL NEGOCIO</div>
-                <a href="index.php" class="nav-item active">
-                    <i class="fas fa-utensils"></i> Menú
-                </a>
-                <a href="../usuarios/index.php" class="nav-item">
-                    <i class="fas fa-user-tie"></i> Empleados
-                </a>
-                <a href="../reportes/index.php" class="nav-item">
-                    <i class="fas fa-chart-line"></i> Reportes
-                </a>
-            </div>
-            
-            <!-- INVENTARIO -->
-            <div class="nav-section">
-                <div class="nav-section-title">INVENTARIO</div>
-                <a href="../inventario/index.php" class="nav-item">
-                    <i class="fas fa-boxes"></i> Stock
-                </a>
-            </div>
-            
-            <!-- ADMINISTRACIÓN WEB -->
-            <div class="nav-section">
-                <div class="nav-section-title">ADMINISTRACIÓN WEB</div>
-                <a href="../web/usuarios.php" class="nav-item">
-                    <i class="fas fa-users-cog"></i> Usuarios Web
-                </a>
-            </div>
-            
-            <hr style="margin: 25px 20px; border: none; border-top: 1px solid var(--admin-border);">
-            <a href="../../../index.php" class="nav-item">
-                <i class="fas fa-home"></i> Volver al Sitio
-            </a>
-        </nav>
-    </div>
+    <?php include '../components/sidebar.php'; ?>
 
     <main class="admin-content">
         <div class="card">

@@ -62,26 +62,7 @@ $turnos = $db->fetchAll("SELECT TurnoID, Descripcion FROM Turno ORDER BY Descrip
 <body>
     <div class="admin-container">
         <!-- Sidebar -->
-        <div class="admin-sidebar">
-            <div style="padding: 25px; border-bottom: 2px solid var(--admin-border);">
-                <h3 style="margin: 0; color: var(--admin-text); display: flex; align-items: center; gap: 12px;">
-                    <i class="fas fa-utensils" style="color: var(--admin-primary); font-size: 1.5rem;"></i>
-                    Chifa Matsue
-                </h3>
-                <small style="color: var(--admin-text-light); font-weight: 600; margin-top: 5px; display: block;">Administración</small>
-            </div>
-            <nav class="admin-nav" style="padding: 25px 0;">
-                <a href="../dashboard.php" class="nav-item">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard
-                </a>
-                <div class="nav-section">
-                    <div class="nav-section-title">PERSONAL</div>
-                    <a href="empleados.php" class="nav-item active">
-                        <i class="fas fa-id-badge"></i> Personal
-                    </a>
-                </div>
-            </nav>
-        </div>
+        <?php include '../components/sidebar.php'; ?>
 
         <!-- Contenido Principal -->
         <main class="admin-content">

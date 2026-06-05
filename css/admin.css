@@ -116,19 +116,20 @@
 }
 
 .admin-sidebar {
-    width: 300px;
+    width: 280px;
     background: var(--admin-white);
     box-shadow: var(--admin-shadow-lg);
     position: fixed;
     height: 100vh;
     overflow-y: auto;
+    overflow-x: hidden;
     z-index: 1000;
     border-right: 1px solid var(--admin-border);
 }
 
 .admin-content {
     flex: 1;
-    margin-left: 300px;
+    margin-left: 280px;
     padding: 30px;
     min-height: 100vh;
     background: var(--admin-bg);
@@ -173,35 +174,37 @@
 .nav-item {
     display: flex;
     align-items: center;
-    padding: 15px 30px;
+    padding: 12px 20px;
     color: var(--admin-text-light);
     text-decoration: none;
-    transition: var(--admin-transition);
-    border-left: 4px solid transparent;
-    font-weight: 600;
+    transition: background-color 0.2s ease, color 0.2s ease, border-left-color 0.2s ease;
+    border-left: 3px solid transparent;
+    font-weight: 500;
     font-size: 0.95rem;
     margin: 2px 0;
+    will-change: auto;
 }
 
 .nav-item:hover {
-    background: rgba(14, 1, 1, 0.05);
+    background: rgba(14, 1, 1, 0.08);
     color: var(--admin-text);
     text-decoration: none;
-    transform: translateX(5px);
+    border-left-color: rgba(14, 1, 1, 0.3);
 }
 
 .nav-item.active {
-    background: linear-gradient(90deg, rgba(14, 1, 1, 0.1) 0%, rgba(155, 3, 3, 0.05) 100%);
+    background: rgba(14, 1, 1, 0.12);
     color: var(--admin-primary);
     border-left-color: var(--admin-primary);
     font-weight: 700;
 }
 
 .nav-item i {
-    width: 22px;
-    margin-right: 15px;
+    width: 20px;
+    margin-right: 12px;
     text-align: center;
-    font-size: 1.1rem;
+    font-size: 1rem;
+    flex-shrink: 0;
 }
 
 /* Cards del dashboard */
@@ -668,25 +671,7 @@
     transform: translateX(2px);
 }
 
-.nav-item {
-    position: relative;
-    overflow: hidden;
-}
 
-.nav-item::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(14, 1, 1, 0.05), transparent);
-    transition: left 0.5s;
-}
-
-.nav-item:hover::before {
-    left: 100%;
-}
 
 /* Scrollbar personalizado */
 .admin-sidebar::-webkit-scrollbar {
@@ -711,45 +696,15 @@
 }
 
 .nav-section-title {
-    font-size: 0.75rem;
-    font-weight: 700;
+    font-size: 0.7rem;
+    font-weight: 800;
     color: var(--admin-text-light);
     text-transform: uppercase;
-    letter-spacing: 1px;
-    padding: 10px 20px 5px 20px;
+    letter-spacing: 1.2px;
+    padding: 15px 20px 8px 20px;
+    margin-top: 10px;
     margin-bottom: 5px;
-    border-bottom: 1px solid rgba(225, 218, 218, 0.2);
-}
-
-.nav-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 20px;
-    color: var(--admin-text-light);
-    text-decoration: none;
-    font-weight: 500;
-    transition: var(--admin-transition);
-    border-left: 3px solid transparent;
-}
-
-.nav-item:hover {
-    background: rgba(231, 76, 60, 0.1);
-    color: var(--admin-primary);
-    border-left-color: var(--admin-primary);
-}
-
-.nav-item.active {
-    background: rgba(231, 76, 60, 0.15);
-    color: var(--admin-primary);
-    border-left-color: var(--admin-primary);
-    font-weight: 600;
-}
-
-.nav-item i {
-    width: 18px;
-    text-align: center;
-    font-size: 1rem;
+    opacity: 0.7;
 }
 
 /* Badges para roles */

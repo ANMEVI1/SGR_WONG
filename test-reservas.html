@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - API Reservas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test - API de Reservas</h1>
+        
+        <div class="test-section">
+            <h3>1. Verificar Conexión a Base de Datos</h3>
+            <button onclick="testConexion()">Probar Conexión</button>
+            <div id="result1" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>2. Verificar Configuración de Reservas</h3>
+            <button onclick="testConfiguracion()">Verificar Config</button>
+            <div id="result2" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>3. Crear Reserva de Prueba</h3>
+            <button onclick="testCrearReserva()">Crear Reserva Test</button>
+            <div id="result3" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>4. Verificar Ruta del Archivo</h3>
+            <button onclick="testRuta()">Verificar Ruta</button>
+            <div id="result4" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'api/reservas/crear.php';
+
+        async function testConexion() {
+            const result = document.getElementById('result1');
+            result.textContent = 'Probando conexión...';
+            result.className = 'result info';
+
+            try {
+                const response = await fetch('api/reservas/test-conexion.php');
+                const data = await response.json();
+                
+                result.textContent = JSON.stringify(data, null, 2);
+                result.className = data.success ? 'result success' : 'result error';
+            } catch (error) {
+                result.textContent = 'ERROR: ' + error.message + '\n\nVerifica que XAMPP esté corriendo y que estés accediendo desde http://localhost/';
+                result.className = 'result error';
+            }
+        }
+
+        async function testConfiguracion() {
+            const result = document.getElementById('result2');
+            result.textContent = 'Verificando configuración...';
+            result.className = 'result info';
+
+            try {
+                const response = await fetch('api/reservas/test-config.php');
+                const data = await response.json();
+                
+                result.textContent = JSON.stringify(data, null, 2);
+                result.className = data.success ? 'result success' : 'result error';
+            } catch (error) {
+                result.textContent = 'ERROR: ' + error.message;
+                result.className = 'result error';
+            }
+        }
+
+        async function testCrearReserva() {
+            const result = document.getElementById('result3');
+            result.textContent = 'Creando reserva de prueba...';
+            result.className = 'result info';
+
+            // Calcular fecha y hora válidas (mañana a las 19:00)
+            const manana = new Date();
+            manana.setDate(manana.getDate() + 1);
+            const fecha = manana.toISOString().split('T')[0];
+
+            const formData = new FormData();
+            formData.append('nombre', 'Test Usuario');
+            formData.append('correo', 'test@example.com');
+            formData.append('telefono', '999999999');
+            formData.append('fecha', fecha);
+            formData.append('hora', '19:00');
+            formData.append('personas', '4');
+            formData.append('comentarios', 'Reserva de prueba desde test.html');
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                result.textContent = JSON.stringify(data, null, 2);
+                result.className = data.success ? 'result success' : 'result error';
+            } catch (error) {
+                result.textContent = 'ERROR: ' + error.message + '\n\nURL intentada: ' + API_URL;
+                result.className = 'result error';
+            }
+        }
+
+        function testRuta() {
+            const result = document.getElementById('result4');
+            result.className = 'result info';
+            
+            const info = {
+                'URL Actual': window.location.href,
+                'Protocolo': window.location.protocol,
+                'Host': window.location.host,
+                'Pathname': window.location.pathname,
+                'API URL (relativa)': API_URL,
+                'API URL (absoluta)': new URL(API_URL, window.location.href).href
+            };
+            
+            result.textContent = JSON.stringify(info, null, 2);
+        }
+
+        // Ejecutar test de ruta automáticamente
+        window.onload = () => {
+            testRuta();
+        };
+    </script>
+</body>
+</html>

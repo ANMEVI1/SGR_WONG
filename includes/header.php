@@ -20,7 +20,7 @@ $baseUrl = str_repeat('../', $depth);
                 <i class="fas fa-bars"></i>
             </button>
             <a href="<?= $baseUrl ?>index.php" class="logo">
-                <img src="<?= $baseUrl ?>assets/plato ramen.jpg" alt="Logo Matsue">
+                <img src="<?= $baseUrl ?>assets/chifa_logo_org.png" alt="Logo Matsue">
                 <span>Matsue</span>
             </a>
         </div>

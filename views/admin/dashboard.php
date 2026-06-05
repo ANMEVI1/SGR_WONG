@@ -54,8 +54,12 @@ $topPlatos = $db->fetchAll(
     [':today' => $today]
 );
 
-// Determinar si es admin (todos los usuarios backoffice tienen acceso completo por ahora)
-$isAdmin = true;
+// Determinar permisos según rol del usuario
+$userTipUsuID = (int)$currentUser['rol_id'];
+$isAdmin = ($userTipUsuID === 1); // Solo administradores
+$isCajero = ($userTipUsuID === 2);
+$isMozo = ($userTipUsuID === 3);
+$isAlmacenero = ($userTipUsuID === 4);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -70,105 +74,40 @@ $isAdmin = true;
 <body>
     <div class="admin-container">
         <!-- Sidebar -->
-        <div class="admin-sidebar">
-            <div style="padding: 25px; border-bottom: 2px solid var(--admin-border);">
-                <h3 style="margin: 0; color: var(--admin-text); display: flex; align-items: center; gap: 12px;">
-                    <i class="fas fa-utensils" style="color: var(--admin-primary); font-size: 1.5rem;"></i>
-                    Chifa Matsue
-                </h3>
-                <small style="color: var(--admin-text-light); font-weight: 600; margin-top: 5px; display: block;">Panel de Administración</small>
-            </div>
-            <nav class="admin-nav" style="padding: 25px 0;">
-                <a href="dashboard.php" class="nav-item active">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard
-                </a>
-                
-                <!-- PUNTO DE VENTA -->
-                <div class="nav-section">
-                    <div class="nav-section-title">PUNTO DE VENTA</div>
-                    <a href="pos/caja.php" class="nav-item">
-                        <i class="fas fa-cash-register"></i> Caja
-                    </a>
-                    <a href="pedidos/index.php" class="nav-item">
-                        <i class="fas fa-shopping-cart"></i> Pedidos
-                    </a>
-                    <a href="pos/clientes.php" class="nav-item">
-                        <i class="fas fa-address-book"></i> Clientes
-                    </a>
-                    <a href="pos/mesas.php" class="nav-item">
-                        <i class="fas fa-table"></i> Mesas
-                    </a>
-                </div>
-                
-                <!-- GESTIÓN DEL NEGOCIO -->
-                <div class="nav-section">
-                    <div class="nav-section-title">GESTIÓN DEL NEGOCIO</div>
-                    <a href="menu/index.php" class="nav-item">
-                        <i class="fas fa-utensils"></i> Menú
-                    </a>
-                    <a href="personal/empleados.php" class="nav-item">
-                        <i class="fas fa-id-badge"></i> Personal
-                    </a>
-                    <a href="negocio/reportes.php" class="nav-item">
-                        <i class="fas fa-chart-line"></i> Reportes
-                    </a>
-                    <a href="negocio/configuracion.php" class="nav-item">
-                        <i class="fas fa-cogs"></i> Configuración
-                    </a>
-                </div>
-                
-                <!-- INVENTARIO -->
-                <div class="nav-section">
-                    <div class="nav-section-title">INVENTARIO</div>
-                    <a href="inventario/index.php" class="nav-item">
-                        <i class="fas fa-boxes"></i> Stock
-                    </a>
-                    <a href="inventario/movimientos.php" class="nav-item">
-                        <i class="fas fa-exchange-alt"></i> Movimientos
-                    </a>
-                    <a href="inventario/proveedores.php" class="nav-item">
-                        <i class="fas fa-truck"></i> Proveedores
-                    </a>
-                </div>
-                
-                <!-- ADMINISTRACIÓN WEB -->
-                <div class="nav-section">
-                    <div class="nav-section-title">ADMINISTRACIÓN WEB</div>
-                    <a href="web/usuarios.php" class="nav-item">
-                        <i class="fas fa-user-cog"></i> Usuarios Sistema
-                    </a>
-                    <a href="web/contenido.php" class="nav-item">
-                        <i class="fas fa-globe"></i> Contenido Web
-                    </a>
-                    <a href="web/pedidos-online.php" class="nav-item">
-                        <i class="fas fa-laptop"></i> Pedidos Online
-                    </a>
-                </div>
-                
-                <hr style="margin: 25px 20px; border: none; border-top: 1px solid var(--admin-border);">
-                <a href="../../index.php" class="nav-item">
-                    <i class="fas fa-home"></i> Volver al Sitio
-                </a>
-            </nav>
-        </div>
+        <?php include 'components/sidebar.php'; ?>
         <!-- Contenido Principal -->
         <main class="admin-content">
             <div class="admin-header">
                 <h1><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
-                <p>Bienvenido, <?= htmlspecialchars($currentUser['login']) ?> - <span class="badge badge-info">Administrador</span></p>
+                <p>Bienvenido, <?= htmlspecialchars($currentUser['login']) ?> - <span class="badge badge-info"><?= htmlspecialchars($currentUser['rol']) ?></span></p>
             </div>
             
             <!-- Acciones Rápidas -->
             <div style="display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap;">
+                <?php if ($isAdmin || $isCajero || $isMozo): ?>
                 <a href="pedidos/index.php" class="btn btn-success">
                     <i class="fas fa-plus"></i> Gestionar Pedidos
                 </a>
+                <?php endif; ?>
+                
+                <?php if ($isAdmin): ?>
                 <a href="menu/index.php" class="btn btn-primary">
                     <i class="fas fa-utensils"></i> Gestionar Menú
                 </a>
-                <a href="usuarios/index.php" class="btn btn-warning">
-                    <i class="fas fa-users"></i> Gestionar Usuarios
+                <a href="personal/empleados.php" class="btn btn-warning">
+                    <i class="fas fa-users"></i> Gestionar Personal
                 </a>
+                <?php endif; ?>
+                
+                <?php if ($isAlmacenero): ?>
+                <a href="inventario/index.php" class="btn btn-info">
+                    <i class="fas fa-boxes"></i> Gestionar Inventario
+                </a>
+                <a href="inventario/proveedores.php" class="btn btn-primary">
+                    <i class="fas fa-truck"></i> Gestionar Proveedores
+                </a>
+                <?php endif; ?>
+                
                 <button class="btn btn-outline" onclick="refreshDashboard()">
                     <i class="fas fa-sync-alt"></i> Actualizar Datos
                 </button>
@@ -176,24 +115,31 @@ $isAdmin = true;
             
             <!-- Métricas del Día -->
             <div class="dashboard-grid">
+                <?php if ($isAdmin || $isCajero): ?>
                 <div class="metric-card success">
                     <div class="metric-label">Ventas del Día</div>
                     <div class="metric-value">S/ <?= number_format($ventasHoy['total_ventas'], 2) ?></div>
                     <small><?= $ventasHoy['total_pedidos'] ?> pedidos</small>
                 </div>
+                <?php endif; ?>
                 
+                <?php if ($isAdmin || $isCajero || $isMozo): ?>
                 <div class="metric-card info">
                     <div class="metric-label">Pedidos Activos</div>
                     <div class="metric-value"><?= count($pedidosActivos) ?></div>
                     <small>En proceso</small>
                 </div>
+                <?php endif; ?>
                 
+                <?php if ($isAdmin || $isAlmacenero): ?>
                 <div class="metric-card <?= count($stockCritico) > 0 ? 'warning' : 'success' ?>">
                     <div class="metric-label">Stock Crítico</div>
                     <div class="metric-value"><?= count($stockCritico) ?></div>
                     <small>Productos por agotar</small>
                 </div>
+                <?php endif; ?>
                 
+                <?php if ($isAdmin): ?>
                 <div class="metric-card">
                     <div class="metric-label">Plato Más Vendido</div>
                     <div class="metric-value" style="font-size: 1.2rem;">
@@ -201,9 +147,11 @@ $isAdmin = true;
                     </div>
                     <small><?= $topPlatos[0]['total_vendido'] ?? 0 ?> unidades</small>
                 </div>
+                <?php endif; ?>
             </div>
             
             <!-- Pedidos Activos -->
+            <?php if ($isAdmin || $isCajero || $isMozo): ?>
             <div class="admin-table" style="margin-top: 30px;">
                 <div style="padding: 25px 30px; border-bottom: 2px solid var(--admin-border); background: var(--admin-white);">
                     <h3 style="margin: 0; color: var(--admin-text); display: flex; align-items: center; gap: 10px;">
@@ -239,9 +187,10 @@ $isAdmin = true;
                     <?php endif; ?>
                 </div>
             </div>
+            <?php endif; ?>
             
             <!-- Alertas de Stock -->
-            <?php if (!empty($stockCritico)): ?>
+            <?php if (($isAdmin || $isAlmacenero) && !empty($stockCritico)): ?>
             <div class="admin-table" style="margin-top: 25px;">
                 <div style="padding: 25px 30px; border-bottom: 2px solid var(--admin-border); background: var(--admin-white); border-left: 5px solid #f39c12;">
                     <h3 style="margin: 0; color: var(--admin-text); display: flex; align-items: center; gap: 10px;">

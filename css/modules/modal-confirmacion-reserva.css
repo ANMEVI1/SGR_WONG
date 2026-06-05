@@ -1,0 +1,523 @@
+/**
+ * Modal de Confirmación de Reserva
+ * Diseño profesional y responsive
+ */
+
+/* Overlay del modal */
+.modal-reserva-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Contenedor del modal */
+.modal-reserva-container {
+    background: white;
+    border-radius: 16px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.4s ease;
+    position: relative;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header del modal */
+.modal-reserva-header {
+    background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+    position: relative;
+}
+
+.modal-reserva-header .icon-success {
+    font-size: 64px;
+    margin-bottom: 15px;
+    animation: bounceIn 0.6s ease;
+}
+
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.modal-reserva-header h2 {
+    margin: 0 0 10px 0;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.modal-reserva-header p {
+    margin: 0;
+    font-size: 16px;
+    opacity: 0.95;
+}
+
+/* Botón cerrar */
+.modal-reserva-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    transition: all 0.3s ease;
+}
+
+.modal-reserva-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+/* Body del modal */
+.modal-reserva-body {
+    padding: 30px;
+}
+
+/* Sección de información */
+.reserva-info-section {
+    margin-bottom: 25px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 12px;
+    border-left: 4px solid var(--gold);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.reserva-info-section h3 {
+    margin: 0 0 15px 0;
+    font-size: 18px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.reserva-info-section h3 i {
+    color: var(--gold);
+}
+
+.reserva-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.reserva-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.reserva-info-item label {
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.reserva-info-item .value {
+    font-size: 17px;
+    color: #1a1a1a;
+    font-weight: 600;
+}
+
+/* Sección de pago */
+.reserva-pago-section {
+    margin-bottom: 25px;
+    padding: 25px;
+    background: linear-gradient(135deg, #fff9e6 0%, #fffef5 100%);
+    border-radius: 12px;
+    border: 2px solid #f4d03f;
+    box-shadow: 0 4px 12px rgba(244, 208, 63, 0.2);
+}
+
+.reserva-pago-section h3 {
+    margin: 0 0 20px 0;
+    font-size: 20px;
+    color: #856404;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.reserva-monto-destacado {
+    text-align: center;
+    margin-bottom: 25px;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.reserva-monto-destacado .label {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.reserva-monto-destacado .monto {
+    font-size: 48px;
+    font-weight: 900;
+    color: #d4af37;
+    margin: 0;
+    line-height: 1;
+    text-shadow: 0 2px 4px rgba(212, 175, 55, 0.2);
+}
+
+.reserva-monto-destacado .descripcion {
+    font-size: 13px;
+    color: #666;
+    margin-top: 10px;
+    font-weight: 500;
+}
+
+/* Instrucciones de pago */
+.reserva-instrucciones-pago {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.reserva-instrucciones-pago h4 {
+    margin: 0 0 15px 0;
+    font-size: 16px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* QR Code */
+.reserva-qr-container {
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+}
+
+.reserva-qr-container img {
+    width: 200px;
+    height: 200px;
+    border: 3px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 10px;
+    background: white;
+}
+
+.reserva-qr-container .qr-label {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #666;
+    font-weight: 600;
+}
+
+/* Datos bancarios */
+.reserva-datos-pago {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.reserva-dato-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.reserva-dato-item:last-child {
+    border-bottom: none;
+}
+
+.reserva-dato-item .label {
+    font-size: 13px;
+    color: #666;
+    font-weight: 600;
+}
+
+.reserva-dato-item .value {
+    font-size: 15px;
+    color: #1a1a1a;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.reserva-dato-item .btn-copiar {
+    background: var(--gold);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.reserva-dato-item .btn-copiar:hover {
+    background: var(--gold-dark);
+    transform: scale(1.05);
+}
+
+/* Nota importante */
+.reserva-nota-importante {
+    background: #d1ecf1;
+    border-left: 4px solid #0c5460;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.reserva-nota-importante p {
+    margin: 0;
+    font-size: 14px;
+    color: #0c5460;
+    line-height: 1.6;
+}
+
+.reserva-nota-importante i {
+    margin-right: 8px;
+    color: #0c5460;
+}
+
+/* Platos pre-ordenados */
+.reserva-platos-lista {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+.reserva-platos-lista ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.reserva-platos-lista li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.reserva-platos-lista li:last-child {
+    border-bottom: none;
+}
+
+.reserva-platos-lista .plato-nombre {
+    font-size: 14px;
+    color: #333;
+}
+
+.reserva-platos-lista .plato-precio {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gold-dark);
+}
+
+/* Footer del modal */
+.modal-reserva-footer {
+    padding: 25px 30px;
+    background: #f8f9fa;
+    border-radius: 0 0 16px 16px;
+    display: flex;
+    gap: 15px;
+}
+
+.modal-reserva-footer .btn {
+    flex: 1;
+    padding: 16px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.modal-reserva-footer .btn-whatsapp {
+    background: #25D366;
+    color: white;
+}
+
+.modal-reserva-footer .btn-whatsapp:hover {
+    background: #1fb855;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(37, 211, 102, 0.3);
+}
+
+.modal-reserva-footer .btn-cerrar {
+    background: #6c757d;
+    color: white;
+}
+
+.modal-reserva-footer .btn-cerrar:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+}
+
+/* Token de cancelación */
+.reserva-token-box {
+    background: #fff;
+    border: 2px dashed #d4af37;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.reserva-token-box .token-label {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.reserva-token-box .token-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #d4af37;
+    font-family: monospace;
+    letter-spacing: 2px;
+}
+
+.reserva-token-box .token-info {
+    font-size: 11px;
+    color: #999;
+    margin-top: 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .modal-reserva-container {
+        max-width: 100%;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+
+    .modal-reserva-header {
+        border-radius: 0;
+        padding: 25px 20px;
+    }
+
+    .modal-reserva-header .icon-success {
+        font-size: 52px;
+    }
+
+    .modal-reserva-header h2 {
+        font-size: 24px;
+    }
+
+    .modal-reserva-body {
+        padding: 20px;
+    }
+
+    .reserva-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .reserva-monto-destacado .monto {
+        font-size: 40px;
+    }
+
+    .reserva-qr-container img {
+        width: 180px;
+        height: 180px;
+    }
+
+    .modal-reserva-footer {
+        flex-direction: column;
+    }
+
+    .modal-reserva-footer .btn {
+        width: 100%;
+    }
+}
+
+/* Scrollbar personalizada */
+.modal-reserva-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-reserva-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.modal-reserva-container::-webkit-scrollbar-thumb {
+    background: var(--gold);
+    border-radius: 4px;
+}
+
+.modal-reserva-container::-webkit-scrollbar-thumb:hover {
+    background: var(--gold-dark);
+}

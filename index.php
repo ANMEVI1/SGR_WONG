@@ -44,6 +44,13 @@ $currentUser = getCurrentUser();
             </div>
         </section>
 
+        <!-- Menú del Día (solo visible 12pm-4pm) -->
+        <section class="menu-dia container" id="menu-dia" style="display: none; padding: 80px 0;">
+            <h2 class="section-title" style="color: white;">Menú del Día</h2>
+            <p class="section-subtitle" style="color: white;">Combos económicos disponibles de 12:00pm a 4:00pm</p>
+            <div class="mini-carousel" id="menuDiaGrid"></div>
+        </section>
+
         <!-- Top Ventas -->
         <section class="top-ventas container" id="top-ventas">
             <h2 class="section-title" style="color: white;">Top Ventas</h2>
@@ -112,14 +119,14 @@ $currentUser = getCurrentUser();
                 </div>
                 <div class="location-content">
                     <div class="map-wrapper">
-                        <iframe src="https://www.google.com/maps?q=Zorrillos,+Tumbes,+Peru&output=embed" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d248.8800137604367!2d-80.45814789638825!3d-3.569015716752926!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x90338d003612f835%3A0x85a313ce8aa46ba3!2sMatsue%20Restaurante!5e0!3m2!1ses-419!2spe!4v1780634713938!5m2!1ses-419!2spe" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                     </div>
                     <div class="location-info">
                         <div class="info-item">
                             <i class="fas fa-map-marker-alt"></i>
                             <div>
                                 <h4>Dirección</h4>
-                                <p>Zorrillos, Tumbes, Perú</p>
+                                <p> Tumbes, Perú - San Martín 24002 - Referencia por la torta </p>
                             </div>
                         </div>
                         <div class="info-item">
@@ -127,7 +134,7 @@ $currentUser = getCurrentUser();
                             <div>
                                 <h4>Horario</h4>
                                 <p>Lunes a Domingo</p>
-                                <p>11:00 AM - 10:00 PM</p>
+                                <p>11:00 AM - 11:00 PM</p>
                             </div>
                         </div>
                         <div class="info-item">

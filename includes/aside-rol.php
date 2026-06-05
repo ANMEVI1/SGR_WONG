@@ -84,6 +84,7 @@ $menuByRole = [
     'admin' => [
         ['section' => 'datos', 'label' => 'Mis datos'],
         ['section' => 'pedidos', 'label' => 'Mis pedidos'],
+        ['section' => 'reservas', 'label' => 'Mis reservas'],
         ['section' => 'password', 'label' => 'Contraseña'],
         ['section' => 'admin', 'label' => 'Administrar', 'admin_only' => true],
         ['section' => 'logout', 'label' => 'Cerrar sesión'],
@@ -91,6 +92,7 @@ $menuByRole = [
     'cliente' => [
         ['section' => 'datos', 'label' => 'Mis datos'],
         ['section' => 'pedidos', 'label' => 'Mis pedidos'],
+        ['section' => 'reservas', 'label' => 'Mis reservas'],
         ['section' => 'direcciones', 'label' => 'Direcciones'],
         ['section' => 'password', 'label' => 'Contraseña'],
         ['section' => 'logout', 'label' => 'Cerrar sesión'],
@@ -134,6 +136,12 @@ $menuItems = $isAdmin ? $menuByRole['admin'] : $menuByRole['cliente'];
                             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
                                 <circle cx="12" cy="10" r="3"/>
+                            </svg>
+                        <?php elseif ($item['section'] === 'reservas'): ?>
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                <path d="M16 2v4M8 2v4M3 10h18"/>
+                                <circle cx="12" cy="15" r="2"/>
                             </svg>
                         <?php elseif ($item['section'] === 'password'): ?>
                             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">

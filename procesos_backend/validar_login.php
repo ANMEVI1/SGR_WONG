@@ -72,8 +72,26 @@ try {
 
     // Redireccionar según el rol
     if ($usuario['RolScope'] === 'backoffice') {
-        header('Location: ../views/admin/menu/index.php');
+        // Redirección específica según tipo de usuario backoffice
+        switch ($usuario['TipUsuID']) {
+            case 1: // Administrador
+                header('Location: ../views/admin/dashboard.php');
+                break;
+            case 2: // Cajero
+                header('Location: ../views/admin/pos/caja.php');
+                break;
+            case 3: // Mozo
+                header('Location: ../views/admin/pedidos/index.php');
+                break;
+            case 4: // Almacenero
+                header('Location: ../views/admin/inventario/index.php');
+                break;
+            default:
+                // Cualquier otro rol backoffice va al dashboard
+                header('Location: ../views/admin/dashboard.php');
+        }
     } else {
+        // Clientes web y otros usuarios van al sitio público
         header('Location: ../index.php');
     }
     exit;

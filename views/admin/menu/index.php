@@ -36,66 +36,7 @@ $platos = $db->fetchAll(
 <body>
     <div class="admin-container">
         <!-- Sidebar -->
-        <div class="admin-sidebar">
-            <div style="padding: 25px; border-bottom: 2px solid var(--admin-border);">
-                <h3 style="margin: 0; color: var(--admin-text); display: flex; align-items: center; gap: 12px;">
-                    <i class="fas fa-utensils" style="color: var(--admin-primary); font-size: 1.5rem;"></i>
-                    Chifa Matsue
-                </h3>
-                <small style="color: var(--admin-text-light); font-weight: 600; margin-top: 5px; display: block;">Panel de Administración</small>
-            </div>
-            <nav class="admin-nav" style="padding: 25px 0;">
-                <a href="../dashboard.php" class="nav-item">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard
-                </a>
-                
-                <!-- PUNTO DE VENTA -->
-                <div class="nav-section">
-                    <div class="nav-section-title">PUNTO DE VENTA</div>
-                    <a href="../pos/caja.php" class="nav-item">
-                        <i class="fas fa-cash-register"></i> Caja
-                    </a>
-                    <a href="../pedidos/index.php" class="nav-item">
-                        <i class="fas fa-shopping-cart"></i> Pedidos
-                    </a>
-                </div>
-                
-                <!-- GESTIÓN DEL NEGOCIO -->
-                <div class="nav-section">
-                    <div class="nav-section-title">GESTIÓN DEL NEGOCIO</div>
-                    <a href="index.php" class="nav-item active">
-                        <i class="fas fa-utensils"></i> Menú
-                    </a>
-                    <a href="../usuarios/index.php" class="nav-item">
-                        <i class="fas fa-user-tie"></i> Empleados
-                    </a>
-                    <a href="../reportes/index.php" class="nav-item">
-                        <i class="fas fa-chart-line"></i> Reportes
-                    </a>
-                </div>
-                
-                <!-- INVENTARIO -->
-                <div class="nav-section">
-                    <div class="nav-section-title">INVENTARIO</div>
-                    <a href="../inventario/index.php" class="nav-item">
-                        <i class="fas fa-boxes"></i> Stock
-                    </a>
-                </div>
-                
-                <!-- ADMINISTRACIÓN WEB -->
-                <div class="nav-section">
-                    <div class="nav-section-title">ADMINISTRACIÓN WEB</div>
-                    <a href="../web/usuarios.php" class="nav-item">
-                        <i class="fas fa-users-cog"></i> Usuarios Web
-                    </a>
-                </div>
-                
-                <hr style="margin: 25px 20px; border: none; border-top: 1px solid var(--admin-border);">
-                <a href="../../../index.php" class="nav-item">
-                    <i class="fas fa-home"></i> Volver al Sitio
-                </a>
-            </nav>
-        </div>
+        <?php include '../components/sidebar.php'; ?>
 
         <!-- Contenido Principal -->
         <main class="admin-content">
@@ -194,22 +135,56 @@ async function toggleFlag(id, flag, valor) {
 
     const res  = await fetch('api.php', { method: 'POST', body: fd });
     const json = await res.json();
-    if (!json.ok) alert('Error al actualizar: ' + json.message);
+    if (!json.ok) {
+        alert('Error al actualizar: ' + json.message);
+    }
 }
 
 async function toggleEstado(id, nuevoEstado, btn) {
+    // Deshabilitar botón mientras se procesa
+    btn.disabled = true;
+    const iconOriginal = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    
     const fd = new FormData();
     fd.append('accion', 'toggle_estado');
     fd.append('id', id);
     fd.append('estado', nuevoEstado);
 
-    const res  = await fetch('api.php', { method: 'POST', body: fd });
-    const json = await res.json();
+    try {
+        const res = await fetch('api.php', { method: 'POST', body: fd });
+        const json = await res.json();
 
-    if (json.ok) {
-        location.reload();
-    } else {
-        alert('Error: ' + json.message);
+        if (json.ok) {
+            // Actualizar badge de estado
+            const row = btn.closest('tr');
+            const badge = row.querySelector('.badge');
+            
+            if (nuevoEstado === 'Disponible') {
+                badge.className = 'badge badge-success';
+                badge.textContent = 'Disponible';
+                btn.style.background = '#dc3545';
+                btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+                btn.onclick = function() { toggleEstado(id, 'Oculto', this); };
+            } else {
+                badge.className = 'badge badge-danger';
+                badge.textContent = 'Oculto';
+                btn.style.background = '#28a745';
+                btn.innerHTML = '<i class="fas fa-eye"></i>';
+                btn.onclick = function() { toggleEstado(id, 'Disponible', this); };
+            }
+            
+            btn.disabled = false;
+        } else {
+            alert('Error: ' + json.message);
+            btn.innerHTML = iconOriginal;
+            btn.disabled = false;
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error de conexión');
+        btn.innerHTML = iconOriginal;
+        btn.disabled = false;
     }
 }
 </script>

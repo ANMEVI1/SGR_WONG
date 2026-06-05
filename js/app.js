@@ -78,11 +78,15 @@ class ChifaApp {
     async initMenu() {
         this.actualizarContadorCarrito();
         
+        // Validar horario para Menú del Día
+        this.checkMenuDiaHorario();
+        
         // Cargar secciones del menú
         await Promise.all([
             this.cargarSeccion('todos', document.getElementById('menuGrid'), 'card'),
             this.cargarSeccion('top', document.querySelector('#top-ventas .mini-carousel'), 'mini'),
             this.cargarSeccion('promo', document.querySelector('#promociones .mini-carousel'), 'mini'),
+            this.cargarMenuDia(),
             this.iniciarBusqueda()
         ]);
     }
@@ -147,6 +151,75 @@ class ChifaApp {
     
     skeletonHTML(count = 4) {
         return Array(count).fill('<div class=\"menu-item skeleton\"></div>').join('');
+    }
+    
+    // ====================== MENÚ DEL DÍA ======================
+    checkMenuDiaHorario() {
+        const ahora = new Date();
+        const hora = ahora.getHours();
+        
+        const seccion = document.getElementById('menu-dia');
+        if (!seccion) return;
+        
+        // Mostrar solo entre 12pm (12) y 4pm (16)
+        if (hora >= 12 && hora < 16) {
+            seccion.style.display = 'block';
+        } else {
+            seccion.style.display = 'none';
+        }
+        
+        // Revisar cada hora para actualizar
+        setTimeout(() => this.checkMenuDiaHorario(), 60 * 60 * 1000);
+    }
+    
+    async cargarMenuDia() {
+        const contenedor = document.getElementById('menuDiaGrid');
+        if (!contenedor) return;
+        
+        contenedor.innerHTML = this.skeletonHTML(3);
+        
+        try {
+            const response = await fetch('api/menu-dia.php');
+            const data = await response.json();
+            
+            if (!data.success || !data.data?.length) {
+                contenedor.innerHTML = '<p class=\"empty-menu\">No hay menús del día disponibles.</p>';
+                return;
+            }
+            
+            contenedor.innerHTML = data.data.map(menu => this.menuDiaCardHTML(menu)).join('');
+            
+        } catch (error) {
+            console.error('Error cargando menú del día:', error);
+            contenedor.innerHTML = '<p class=\"empty-menu\">Error al cargar los menús.</p>';
+        }
+    }
+    
+    menuDiaCardHTML(menu) {
+        const componentes = menu.componentes.map(c => 
+            `<li><i class=\"fas fa-check\" style=\"color: var(--gold); margin-right: 8px;\"></i>${c.descripcion}</li>`
+        ).join('');
+        
+        return `
+            <div class=\"mini-item\" style=\"min-width: 320px; cursor: pointer;\" 
+                 onclick=\"app.mostrarDetalleMenuDia(${menu.id})\">
+                <img src=\"${menu.imagen}\" alt=\"${menu.nombre}\" loading=\"lazy\"
+                     onerror=\"this.src='assets/img/menu-dia/default.jpg'\">
+                <div style=\"padding: 16px;\">
+                    <p style=\"font-weight: 700; font-size: 1.1rem; margin-bottom: 10px;\">${menu.nombre}</p>
+                    <ul style=\"font-size: 0.85rem; color: #666; line-height: 1.6; padding-left: 0; margin-bottom: 12px; list-style: none;\">
+                        ${componentes}
+                    </ul>
+                    <span style=\"display: block; font-size: 1.4rem; font-weight: 800; color: var(--gold-dark);\">S/ ${menu.precio.toFixed(2)}</span>
+                    <small style=\"color: #999; font-size: 0.75rem; display: block; margin-top: 4px;\">
+                        Disponible ${menu.hora_inicio.substring(0,5)} - ${menu.hora_fin.substring(0,5)}
+                    </small>
+                </div>
+            </div>`;
+    }
+    
+    mostrarDetalleMenuDia(menuId) {
+        this.mostrarNotificacion('Funcionalidad de pedido próximamente', 'info');
     }
     
     // ====================== BÚSQUEDA ======================

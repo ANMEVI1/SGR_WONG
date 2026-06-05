@@ -11,10 +11,10 @@ if (!isset($baseUrl)) {
             
             <div class="footer-brand">
                 <div class="footer-logo-box">
-                    <img src="<?= $baseUrl ?>assets/logo_proyect.svg" alt="Logo Chifa Matsue">
+                    <img src="<?= $baseUrl ?>assets/chifa_logo_org.png" alt="Logo Chifa Matsue">
                     <span>Chifa Matsue</span>
                 </div>
-                <p>La mejor comida rápida de la ciudad, preparada con ingredientes frescos y mucho amor. ¡Siente el sabor!</p>
+                <p>La mejor comida china de la región, preparada con ingredientes frescos y mucho amor. ¡Siente el sabor!</p>
                 <div class="social-icons">
                     <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
                     <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
@@ -41,7 +41,7 @@ if (!isset($baseUrl)) {
             <div class="qr-section">
                 <h3>¡Ordena tu Chifa!</h3>
                 <p>Escanea el código QR</p>
-                <img src="<?= $baseUrl ?>assets/qr.png" alt="Código QR para pedidos">
+                <img src="<?= $baseUrl ?>assets\CARTAS_MATSUE\LA_CARTA_PDF\QR.png" alt="Código QR para pedidos">
             </div>
         </section>
         

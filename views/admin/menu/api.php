@@ -19,6 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 require_once __DIR__ . '/../../../config/conexion.php';
 
 $accion = $_POST['accion'] ?? '';
+$db = getDB();
 
 // ── Helpers ──────────────────────────────────────────────────
 
@@ -72,29 +73,55 @@ switch ($accion) {
 
         $imagenURL = subirImagen() ?? 'assets/img/platos/default.jpg';
 
-        $stmt = $conexion->prepare(
-            "INSERT INTO Plato (Nombre, Descripcion, Imagen_URL, Estado, Orden, Es_Top, Es_Promo, CatID)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-        );
-        $stmt->bind_param('ssssiiii', $nombre, $desc, $imagenURL, $estado, $orden, $esTop, $esPromo, $catID);
-        if (!$stmt->execute()) fail('Error al crear el plato.');
-        $platoID = $conexion->insert_id;
-        $stmt->close();
+        try {
+            $db->beginTransaction();
+            
+            $db->execute(
+                "INSERT INTO Plato (Nombre, Descripcion, Imagen_URL, Estado, Orden, Es_Top, Es_Promo, CatID)
+                 VALUES (:nombre, :desc, :imagen, :estado, :orden, :top, :promo, :catID)",
+                [
+                    ':nombre' => $nombre,
+                    ':desc' => $desc,
+                    ':imagen' => $imagenURL,
+                    ':estado' => $estado,
+                    ':orden' => $orden,
+                    ':top' => $esTop,
+                    ':promo' => $esPromo,
+                    ':catID' => $catID
+                ]
+            );
+            $platoID = (int)$db->lastInsertId();
 
-        // Insertar variantes
-        $nombres  = $_POST['variante_nombre'] ?? [];
-        $precios  = $_POST['variante_precio'] ?? [];
-        $stmtV = $conexion->prepare("INSERT INTO Plato_Variante (PlatoID, Nombre, Precio_Venta) VALUES (?, ?, ?)");
-        foreach ($nombres as $i => $vNombre) {
-            $vNombre = trim($vNombre);
-            $vPrecio = (float)($precios[$i] ?? 0);
-            if ($vNombre === '' || $vPrecio <= 0) continue;
-            $stmtV->bind_param('isd', $platoID, $vNombre, $vPrecio);
-            $stmtV->execute();
+            // Insertar variantes
+            $nombres  = $_POST['variante_nombre'] ?? [];
+            $precios  = $_POST['variante_precio'] ?? [];
+            
+            if (empty($nombres) || empty($precios)) {
+                $db->rollback();
+                fail('Debe agregar al menos una variante con precio.');
+            }
+            
+            foreach ($nombres as $i => $vNombre) {
+                $vNombre = trim($vNombre);
+                $vPrecio = (float)($precios[$i] ?? 0);
+                if ($vNombre === '' || $vPrecio <= 0) continue;
+                
+                $db->execute(
+                    "INSERT INTO Plato_Variante (PlatoID, Nombre, Precio_Venta) VALUES (:platoID, :nombre, :precio)",
+                    [':platoID' => $platoID, ':nombre' => $vNombre, ':precio' => $vPrecio]
+                );
+            }
+
+            $db->commit();
+            ok('Plato creado correctamente.');
+            
+        } catch (Exception $e) {
+            if ($db->inTransaction()) {
+                $db->rollback();
+            }
+            error_log('Error crear plato: ' . $e->getMessage());
+            fail('Error al crear el plato: ' . $e->getMessage());
         }
-        $stmtV->close();
-
-        ok('Plato creado correctamente.');
 
     // ── Editar plato ─────────────────────────────────────────
     case 'editar':
@@ -111,45 +138,59 @@ switch ($accion) {
 
         $imagenURL = subirImagen();
 
-        if ($imagenURL) {
-            $stmt = $conexion->prepare(
-                "UPDATE Plato SET Nombre=?, Descripcion=?, Imagen_URL=?, Estado=?, Orden=?, Es_Top=?, Es_Promo=?, CatID=?
-                 WHERE PlatoID=?"
-            );
-            $stmt->bind_param('ssssiiiii', $nombre, $desc, $imagenURL, $estado, $orden, $esTop, $esPromo, $catID, $id);
-        } else {
-            $stmt = $conexion->prepare(
-                "UPDATE Plato SET Nombre=?, Descripcion=?, Estado=?, Orden=?, Es_Top=?, Es_Promo=?, CatID=?
-                 WHERE PlatoID=?"
-            );
-            $stmt->bind_param('sssiiiii', $nombre, $desc, $estado, $orden, $esTop, $esPromo, $catID, $id);
-        }
-        if (!$stmt->execute()) fail('Error al actualizar el plato.');
-        $stmt->close();
-
-        // Sincronizar variantes
-        $varIDs   = $_POST['variante_id']     ?? [];
-        $varNoms  = $_POST['variante_nombre'] ?? [];
-        $varPrecs = $_POST['variante_precio'] ?? [];
-
-        foreach ($varNoms as $i => $vNombre) {
-            $vNombre = trim($vNombre);
-            $vPrecio = (float)($varPrecs[$i] ?? 0);
-            $vID     = (int)($varIDs[$i] ?? 0);
-            if ($vNombre === '' || $vPrecio <= 0) continue;
-
-            if ($vID > 0) {
-                $s = $conexion->prepare("UPDATE Plato_Variante SET Nombre=?, Precio_Venta=? WHERE VarianteID=? AND PlatoID=?");
-                $s->bind_param('sdii', $vNombre, $vPrecio, $vID, $id);
+        try {
+            if ($imagenURL) {
+                $db->execute(
+                    "UPDATE Plato SET Nombre=:nombre, Descripcion=:desc, Imagen_URL=:imagen, Estado=:estado, 
+                     Orden=:orden, Es_Top=:top, Es_Promo=:promo, CatID=:catID WHERE PlatoID=:id",
+                    [
+                        ':nombre' => $nombre, ':desc' => $desc, ':imagen' => $imagenURL,
+                        ':estado' => $estado, ':orden' => $orden, ':top' => $esTop,
+                        ':promo' => $esPromo, ':catID' => $catID, ':id' => $id
+                    ]
+                );
             } else {
-                $s = $conexion->prepare("INSERT INTO Plato_Variante (PlatoID, Nombre, Precio_Venta) VALUES (?, ?, ?)");
-                $s->bind_param('isd', $id, $vNombre, $vPrecio);
+                $db->execute(
+                    "UPDATE Plato SET Nombre=:nombre, Descripcion=:desc, Estado=:estado, 
+                     Orden=:orden, Es_Top=:top, Es_Promo=:promo, CatID=:catID WHERE PlatoID=:id",
+                    [
+                        ':nombre' => $nombre, ':desc' => $desc, ':estado' => $estado,
+                        ':orden' => $orden, ':top' => $esTop, ':promo' => $esPromo,
+                        ':catID' => $catID, ':id' => $id
+                    ]
+                );
             }
-            $s->execute();
-            $s->close();
-        }
 
-        ok('Plato actualizado correctamente.');
+            // Sincronizar variantes
+            $varIDs   = $_POST['variante_id']     ?? [];
+            $varNoms  = $_POST['variante_nombre'] ?? [];
+            $varPrecs = $_POST['variante_precio'] ?? [];
+
+            foreach ($varNoms as $i => $vNombre) {
+                $vNombre = trim($vNombre);
+                $vPrecio = (float)($varPrecs[$i] ?? 0);
+                $vID     = (int)($varIDs[$i] ?? 0);
+                if ($vNombre === '' || $vPrecio <= 0) continue;
+
+                if ($vID > 0) {
+                    $db->execute(
+                        "UPDATE Plato_Variante SET Nombre=:nombre, Precio_Venta=:precio 
+                         WHERE VarianteID=:vID AND PlatoID=:platoID",
+                        [':nombre' => $vNombre, ':precio' => $vPrecio, ':vID' => $vID, ':platoID' => $id]
+                    );
+                } else {
+                    $db->execute(
+                        "INSERT INTO Plato_Variante (PlatoID, Nombre, Precio_Venta) VALUES (:platoID, :nombre, :precio)",
+                        [':platoID' => $id, ':nombre' => $vNombre, ':precio' => $vPrecio]
+                    );
+                }
+            }
+
+            ok('Plato actualizado correctamente.');
+        } catch (Exception $e) {
+            error_log('Error editar plato: ' . $e->getMessage());
+            fail('Error al actualizar el plato.');
+        }
 
     // ── Cambiar estado (Disponible / Oculto) ─────────────────
     case 'toggle_estado':
@@ -157,11 +198,16 @@ switch ($accion) {
         $estado = $_POST['estado'] === 'Oculto' ? 'Oculto' : 'Disponible';
         if ($id === 0) fail('ID inválido.');
 
-        $stmt = $conexion->prepare("UPDATE Plato SET Estado = ? WHERE PlatoID = ?");
-        $stmt->bind_param('si', $estado, $id);
-        $stmt->execute();
-        $stmt->close();
-        ok('Estado actualizado.');
+        try {
+            $db->execute(
+                "UPDATE Plato SET Estado = :estado WHERE PlatoID = :id",
+                [':estado' => $estado, ':id' => $id]
+            );
+            ok('Estado actualizado.');
+        } catch (Exception $e) {
+            error_log('Error toggle_estado: ' . $e->getMessage());
+            fail('Error al actualizar estado.');
+        }
 
     // ── Cambiar flag Top / Promo ──────────────────────────────
     case 'toggle_flag':
@@ -172,11 +218,17 @@ switch ($accion) {
         if ($id === 0 || !in_array($flag, ['top', 'promo'])) fail('Datos inválidos.');
 
         $col  = $flag === 'top' ? 'Es_Top' : 'Es_Promo';
-        $stmt = $conexion->prepare("UPDATE Plato SET {$col} = ? WHERE PlatoID = ?");
-        $stmt->bind_param('ii', $valor, $id);
-        $stmt->execute();
-        $stmt->close();
-        ok('Flag actualizado.');
+        
+        try {
+            $db->execute(
+                "UPDATE Plato SET {$col} = :valor WHERE PlatoID = :id",
+                [':valor' => $valor, ':id' => $id]
+            );
+            ok('Flag actualizado.');
+        } catch (Exception $e) {
+            error_log('Error toggle_flag: ' . $e->getMessage());
+            fail('Error al actualizar flag.');
+        }
 
     default:
         fail('Acción no reconocida.');

@@ -1,0 +1,390 @@
+/**
+ * Estilos: Módulo Mis Reservas
+ * Integración con modal de perfil
+ */
+
+/* Grid de reservas */
+.reservas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Tarjeta de reserva */
+.reserva-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border-left: 4px solid #d4af37;
+}
+
+.reserva-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.reserva-card.pendiente {
+    border-left-color: #ffc107;
+}
+
+.reserva-card.confirmada {
+    border-left-color: #28a745;
+}
+
+.reserva-card.cancelada {
+    border-left-color: #dc3545;
+}
+
+.reserva-card.completada {
+    border-left-color: #6c757d;
+}
+
+.reserva-card.no-show {
+    border-left-color: #ff6b6b;
+}
+
+/* Header de tarjeta */
+.reserva-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.reserva-numero {
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+}
+
+/* Badge de estado */
+.reserva-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.reserva-badge-pendiente {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.reserva-badge-confirmada {
+    background: #d4edda;
+    color: #155724;
+}
+
+.reserva-badge-cancelada {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.reserva-badge-completada {
+    background: #e2e3e5;
+    color: #383d41;
+}
+
+.reserva-badge-no-show {
+    background: #ffe0e0;
+    color: #c62828;
+}
+
+/* Body de tarjeta */
+.reserva-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.reserva-info-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #666;
+}
+
+.reserva-info-row svg {
+    flex-shrink: 0;
+    color: #d4af37;
+}
+
+/* Footer de tarjeta */
+.reserva-card-footer {
+    display: flex;
+    gap: 10px;
+    padding-top: 12px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.reserva-card-footer .btn {
+    flex: 1;
+}
+
+/* Botones pequeños */
+.btn-sm {
+    padding: 8px 12px;
+    font-size: 13px;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid #d4af37;
+    color: #d4af37;
+}
+
+.btn-outline:hover {
+    background: #d4af37;
+    color: white;
+}
+
+.btn-outline-danger {
+    background: transparent;
+    border: 1px solid #dc3545;
+    color: #dc3545;
+}
+
+.btn-outline-danger:hover {
+    background: #dc3545;
+    color: white;
+}
+
+/* Estado de carga */
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: #999;
+}
+
+.loading-state svg {
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+    color: #d4af37;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Modal de detalles */
+.reserva-detalle-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    padding: 20px;
+    animation: fadeIn 0.3s ease;
+}
+
+.reserva-detalle-modal {
+    background: white;
+    border-radius: 16px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.reserva-detalle-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.reserva-detalle-header h3 {
+    margin: 0;
+    font-size: 20px;
+    color: #333;
+}
+
+.reserva-detalle-close {
+    background: transparent;
+    border: none;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.reserva-detalle-close:hover {
+    background: #f0f0f0;
+}
+
+.reserva-detalle-body {
+    padding: 25px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.detalle-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.detalle-item.full {
+    grid-column: 1 / -1;
+}
+
+.detalle-item label {
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.detalle-item > span {
+    font-size: 15px;
+    color: #333;
+    font-weight: 500;
+}
+
+/* Token box */
+.token-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.token-box code {
+    flex: 1;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    color: #d4af37;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.btn-copy-token {
+    background: #d4af37;
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-copy-token:hover {
+    background: #b8941f;
+    transform: scale(1.05);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .reservas-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .reserva-card-footer {
+        flex-direction: column;
+    }
+
+    .reserva-detalle-body {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+}
+
+/* Estado vacío y error */
+.empty-state,
+.error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.empty-state svg,
+.error-state svg {
+    color: #d4af37;
+    margin-bottom: 20px;
+}
+
+.empty-state p,
+.error-state p {
+    margin: 0 0 20px 0;
+    font-size: 16px;
+    color: #666;
+}
+
+.error-state svg {
+    color: #dc3545;
+}
+
+/* Botón ghost red */
+.btn-ghost-red {
+    background: transparent;
+    border: 1px solid #d4af37;
+    color: #d4af37;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-ghost-red:hover {
+    background: #d4af37;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}

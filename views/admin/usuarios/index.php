@@ -76,81 +76,35 @@ $tiposUsuario = $db->fetchAll(
 <body>
     <div class="admin-container">
         <!-- Sidebar -->
-        <div class="admin-sidebar">
-            <div style="padding: 25px; border-bottom: 2px solid var(--admin-border);">
-                <h3 style="margin: 0; color: var(--admin-text); display: flex; align-items: center; gap: 12px;">
-                    <i class="fas fa-utensils" style="color: var(--admin-primary); font-size: 1.5rem;"></i>
-                    Chifa Matsue
-                </h3>
-                <small style="color: var(--admin-text-light); font-weight: 600; margin-top: 5px; display: block;">Panel de Administración</small>
-            </div>
-            <nav class="admin-nav" style="padding: 25px 0;">
-                <a href="../dashboard.php" class="nav-item">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard
-                </a>
-                
-                <!-- PUNTO DE VENTA -->
-                <div class="nav-section">
-                    <div class="nav-section-title">PUNTO DE VENTA</div>
-                    <a href="../pos/caja.php" class="nav-item">
-                        <i class="fas fa-cash-register"></i> Caja
-                    </a>
-                    <a href="../pedidos/index.php" class="nav-item">
-                        <i class="fas fa-shopping-cart"></i> Pedidos
-                    </a>
-                </div>
-                
-                <!-- GESTIÓN DEL NEGOCIO -->
-                <div class="nav-section">
-                    <div class="nav-section-title">GESTIÓN DEL NEGOCIO</div>
-                    <a href="../menu/index.php" class="nav-item">
-                        <i class="fas fa-utensils"></i> Menú
-                    </a>
-                    <a href="index.php" class="nav-item active">
-                        <i class="fas fa-user-tie"></i> Empleados
-                    </a>
-                    <a href="../reportes/index.php" class="nav-item">
-                        <i class="fas fa-chart-line"></i> Reportes
-                    </a>
-                </div>
-                
-                <!-- INVENTARIO -->
-                <div class="nav-section">
-                    <div class="nav-section-title">INVENTARIO</div>
-                    <a href="../inventario/index.php" class="nav-item">
-                        <i class="fas fa-boxes"></i> Stock
-                    </a>
-                </div>
-                
-                <!-- ADMINISTRACIÓN WEB -->
-                <div class="nav-section">
-                    <div class="nav-section-title">ADMINISTRACIÓN WEB</div>
-                    <a href="../web/usuarios.php" class="nav-item">
-                        <i class="fas fa-users-cog"></i> Usuarios Web
-                    </a>
-                </div>
-                
-                <hr style="margin: 25px 20px; border: none; border-top: 1px solid var(--admin-border);">
-                <a href="../../../index.php" class="nav-item">
-                    <i class="fas fa-home"></i> Volver al Sitio
-                </a>
-            </nav>
-        </div>
+        <?php include '../components/sidebar.php'; ?>
 
         <!-- Contenido Principal -->
         <main class="admin-content">
             <div class="admin-header">
-                <h1><i class="fas fa-user-tie"></i> Gestión de Empleados</h1>
-                <p>Administra el personal del restaurante y sus permisos de acceso</p>
+                <h1><i class="fas fa-user-cog"></i> Usuarios del Sistema</h1>
+                <p>Gestiona los usuarios que pueden acceder al sistema (empleados y clientes web con login)</p>
+            </div>
+            
+            <!-- Mensaje informativo -->
+            <div style="background: #e3f2fd; border-left: 4px solid #2196F3; padding: 15px 20px; margin-bottom: 25px; border-radius: 4px;">
+                <p style="margin: 0; color: #1565C0; font-weight: 600;">
+                    <i class="fas fa-info-circle"></i> 
+                    <strong>Usuarios del Sistema:</strong> Personas con credenciales de acceso (login y contraseña)
+                </p>
+                <small style="color: #1976D2; display: block; margin-top: 8px;">
+                    • <strong>Empleados:</strong> Personal del restaurante (administradores, cajeros, mozos, almaceneros)<br>
+                    • <strong>Clientes Web:</strong> Clientes que se registran desde la página web para hacer pedidos online<br>
+                    • <strong>Nota:</strong> Para clientes sin usuario (ventas presenciales), usa la sección "Clientes" en Punto de Venta
+                </small>
             </div>
 
             <!-- Pestañas para separar tipos de usuarios -->
             <div style="display: flex; gap: 5px; margin-bottom: 30px; border-bottom: 2px solid var(--admin-border);">
                 <button class="tab-btn active" onclick="switchTab('empleados')" id="tabEmpleados">
-                    <i class="fas fa-user-tie"></i> Empleados (Staff)
+                    <i class="fas fa-user-tie"></i> Empleados (Personal)
                 </button>
                 <button class="tab-btn" onclick="switchTab('clientes')" id="tabClientes">
-                    <i class="fas fa-users"></i> Usuarios Web (Clientes)
+                    <i class="fas fa-laptop"></i> Clientes Web (Con Login)
                 </button>
             </div>
 
@@ -160,7 +114,7 @@ $tiposUsuario = $db->fetchAll(
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
                     <div>
                         <button class="btn btn-primary" onclick="openModal('createUser', 'empleado')">
-                            <i class="fas fa-plus"></i> Nuevo Empleado
+                            <i class="fas fa-plus"></i> Crear Usuario Empleado
                         </button>
                         <button class="btn btn-outline" onclick="refreshTable()">
                             <i class="fas fa-sync-alt"></i> Actualizar
@@ -246,7 +200,7 @@ $tiposUsuario = $db->fetchAll(
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
                     <div>
                         <button class="btn btn-success" onclick="openModal('createUser', 'cliente')">
-                            <i class="fas fa-plus"></i> Nuevo Cliente Web
+                            <i class="fas fa-plus"></i> Crear Usuario Cliente Web
                         </button>
                         <button class="btn btn-outline" onclick="refreshTable()">
                             <i class="fas fa-sync-alt"></i> Actualizar
@@ -463,11 +417,11 @@ $tiposUsuario = $db->fetchAll(
             // Actualizar título
             const header = document.querySelector('.admin-header h1');
             if (tabName === 'empleados') {
-                header.innerHTML = '<i class="fas fa-user-tie"></i> Gestión de Empleados';
-                document.querySelector('.admin-header p').textContent = 'Administra el personal del restaurante y sus permisos de acceso';
+                header.innerHTML = '<i class="fas fa-user-cog"></i> Usuarios del Sistema - Empleados';
+                document.querySelector('.admin-header p').textContent = 'Empleados con acceso al sistema (administradores, cajeros, mozos, almaceneros)';
             } else {
-                header.innerHTML = '<i class="fas fa-users"></i> Usuarios Web (Clientes)';
-                document.querySelector('.admin-header p').textContent = 'Administra los clientes que se registran desde la página web';
+                header.innerHTML = '<i class="fas fa-user-cog"></i> Usuarios del Sistema - Clientes Web';
+                document.querySelector('.admin-header p').textContent = 'Clientes que se registraron desde la página web para hacer pedidos online';
             }
         }
 

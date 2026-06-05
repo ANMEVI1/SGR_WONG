@@ -14,7 +14,7 @@
   --red: #e11d48;
   --red-soft: #fde2e7;
   --green: #22c55e;
-
+  --letra_fo: #c9954a;
   --radius-sm: 10px;
   --radius-md: 14px;
   --radius-lg: 18px;
@@ -78,7 +78,7 @@ button {
 }
 
 .logo span {
-  color: var(--red);
+  color: var(--letra_fo);
 }
 
 .search {
@@ -358,6 +358,12 @@ body.modal-open main {
   letter-spacing: 0.3px;
 }
 
+.user-email {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 2px;
+}
+
 .status {
   display: inline-flex;
   align-items: center;
@@ -598,16 +604,121 @@ body.modal-open main {
 
 .empty-state {
   display: flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 12px;
-  padding: 18px 0;
+  padding: 60px 18px;
   color: var(--gray-800);
+  text-align: center;
+}
+
+.empty-state p {
+  margin: 0;
   font-size: 14px;
   font-weight: 600;
+  color: var(--gray-600);
 }
 
 .empty-state svg {
+  color: var(--gray-400);
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 60px 18px;
+  color: var(--gray-500);
+}
+
+.loading-state p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.loading-state svg {
+  animation: spin 1s linear infinite;
+  color: var(--letra_fo);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.reservas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.reserva-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  border-left: 4px solid var(--letra_fo);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.reserva-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.reserva-card.pendiente { border-left-color: #ffc107; }
+.reserva-card.confirmada { border-left-color: #28a745; }
+.reserva-card.cancelada { border-left-color: #dc3545; }
+.reserva-card.completada { border-left-color: #6c757d; }
+
+.reserva-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.reserva-numero {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--black);
+}
+
+.reserva-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.reserva-badge-pendiente { background: #fff3cd; color: #856404; }
+.reserva-badge-confirmada { background: #d4edda; color: #155724; }
+.reserva-badge-cancelada { background: #f8d7da; color: #721c24; }
+.reserva-badge-completada { background: #e2e3e5; color: #383d41; }
+
+.reserva-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reserva-info-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
   color: var(--gray-600);
+}
+
+.reserva-info-row svg {
+  flex-shrink: 0;
+  color: var(--letra_fo);
 }
 
 .actions {
