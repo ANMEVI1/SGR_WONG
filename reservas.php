@@ -3,6 +3,30 @@ require_once 'config/conexion.php';
 startSecureSession();
 
 $currentUser = getCurrentUser();
+
+// Cargar perfil completo si hay usuario
+$profile = [
+    'nombre' => '',
+    'correo' => '',
+    'telefono' => ''
+];
+
+if ($currentUser) {
+    $db = getDB();
+    $usuarioID = $currentUser['id'];
+    
+    // Buscar en Cliente
+    $clienteData = $db->fetchOne(
+        "SELECT Nombre_Apellidos, Correo, Telefono FROM Cliente WHERE UsuarioID = ?",
+        [$usuarioID]
+    );
+    
+    if ($clienteData) {
+        $profile['nombre'] = $clienteData['Nombre_Apellidos'] ?? '';
+        $profile['correo'] = $clienteData['Correo'] ?? '';
+        $profile['telefono'] = $clienteData['Telefono'] ?? '';
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -59,9 +83,9 @@ $currentUser = getCurrentUser();
                         <form class="reserva-form" id="reservaForm">
                             <?php if ($currentUser): ?>
                                 <!-- Campos ocultos con datos del usuario -->
-                                <input type="hidden" id="clienteNombre" value="<?= htmlspecialchars($currentUser['login'] ?? '') ?>">
-                                <input type="hidden" id="clienteCorreo" value="">
-                                <input type="hidden" id="clienteTelefono" value="">
+                                <input type="hidden" id="clienteNombre" value="<?= htmlspecialchars($profile['nombre']) ?>">
+                                <input type="hidden" id="clienteCorreo" value="<?= htmlspecialchars($profile['correo']) ?>">
+                                <input type="hidden" id="clienteTelefono" value="<?= htmlspecialchars($profile['telefono']) ?>">
                             <?php endif; ?>
 
                             <div id="datosContacto" <?= $currentUser ? 'style="display: none;"' : '' ?>>
@@ -71,7 +95,7 @@ $currentUser = getCurrentUser();
                                         Nombre completo
                                         <span class="required">*</span>
                                     </label>
-                                    <input type="text" name="nombre" required placeholder="Ingresa tu nombre completo">
+                                    <input type="text" name="nombre" <?= !$currentUser ? 'required' : '' ?> placeholder="Ingresa tu nombre completo">
                                 </div>
 
                                 <div class="form-group">
@@ -80,7 +104,7 @@ $currentUser = getCurrentUser();
                                         Correo electrónico
                                         <span class="required">*</span>
                                     </label>
-                                    <input type="email" name="correo" required placeholder="tu@correo.com">
+                                    <input type="email" name="correo" <?= !$currentUser ? 'required' : '' ?> placeholder="tu@correo.com">
                                 </div>
 
                                 <div class="form-group">
@@ -89,7 +113,7 @@ $currentUser = getCurrentUser();
                                         Teléfono
                                         <span class="required">*</span>
                                     </label>
-                                    <input type="tel" name="telefono" required placeholder="+51 999 999 999">
+                                    <input type="tel" name="telefono" <?= !$currentUser ? 'required' : '' ?> placeholder="+51 999 999 999">
                                 </div>
                             </div>
 

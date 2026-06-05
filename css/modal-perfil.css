@@ -728,6 +728,289 @@ body.modal-open main {
 }
 
 /* =========================
+   Botón "Ver más" en tarjetas
+========================= */
+
+.btn-ver-detalle {
+  width: 100%;
+  margin-top: 12px;
+  padding: 9px 14px;
+  background: transparent;
+  border: 1px solid var(--letra_fo);
+  color: var(--letra_fo);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all var(--t-base);
+}
+
+.btn-ver-detalle:hover {
+  background: var(--letra_fo);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(201, 149, 74, 0.25);
+}
+
+.btn-ver-detalle:active {
+  transform: translateY(0);
+}
+
+/* =========================
+   Modal de detalles de reserva
+========================= */
+
+.modal-detalle-reserva {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--t-slow);
+}
+
+.modal-detalle-reserva.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal-detalle-content {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  max-width: 640px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  transform: translateY(30px) scale(0.95);
+  transition: transform var(--t-slow);
+}
+
+.modal-detalle-reserva.show .modal-detalle-content {
+  transform: translateY(0) scale(1);
+}
+
+.modal-detalle-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-detalle-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-detalle-content::-webkit-scrollbar-thumb {
+  background-color: var(--gray-300);
+  border-radius: 10px;
+}
+
+.modal-detalle-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--t-base);
+  color: var(--gray-800);
+  z-index: 10;
+}
+
+.modal-detalle-close:hover {
+  background: rgba(0, 0, 0, 0.15);
+  transform: scale(1.1) rotate(90deg);
+}
+
+.modal-detalle-close:active {
+  transform: scale(0.95);
+}
+
+.modal-detalle-header {
+  padding: 28px 28px 20px;
+  border-bottom: 1px solid var(--gray-200);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.modal-detalle-header h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--black);
+  letter-spacing: -0.01em;
+}
+
+.detalle-section {
+  padding: 24px 28px;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.detalle-section:last-child {
+  border-bottom: none;
+  padding-bottom: 28px;
+}
+
+.detalle-section h3 {
+  margin: 0 0 18px 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--black);
+}
+
+.detalle-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.detalle-item {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.detalle-item.full {
+  grid-column: 1 / -1;
+}
+
+.detalle-label {
+  font-size: 12px;
+  color: var(--gray-600);
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+}
+
+.detalle-value {
+  font-size: 15px;
+  color: var(--black);
+  font-weight: 500;
+}
+
+.detalle-observaciones {
+  margin: 0;
+  padding: 14px;
+  background: var(--gray-50);
+  border-radius: 10px;
+  font-size: 14px;
+  color: var(--gray-800);
+  border-left: 3px solid var(--letra_fo);
+  line-height: 1.6;
+}
+
+.tabla-platos {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.tabla-platos thead {
+  background: var(--gray-100);
+}
+
+.tabla-platos th {
+  padding: 12px 10px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--gray-800);
+  border-bottom: 2px solid var(--gray-200);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tabla-platos th:nth-child(2),
+.tabla-platos th:nth-child(3),
+.tabla-platos th:nth-child(4) {
+  text-align: right;
+}
+
+.tabla-platos td {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--gray-100);
+  color: var(--gray-800);
+}
+
+.tabla-platos td:nth-child(2),
+.tabla-platos td:nth-child(3),
+.tabla-platos td:nth-child(4) {
+  text-align: right;
+}
+
+.tabla-platos tbody tr:hover {
+  background: var(--gray-50);
+}
+
+.tabla-platos tfoot td {
+  padding: 14px 10px;
+  font-weight: 700;
+  border-top: 2px solid var(--gray-300);
+  border-bottom: none;
+  background: var(--gray-50);
+  color: var(--black);
+}
+
+.sin-platos-mensaje {
+  padding: 20px;
+  background: var(--gray-50);
+  border-radius: 10px;
+  text-align: center;
+  color: var(--gray-600);
+  font-size: 14px;
+  border: 1px dashed var(--gray-300);
+}
+
+/* Responsive modal detalles */
+@media (max-width: 720px) {
+  .modal-detalle-content {
+    max-height: 100vh;
+    border-radius: 0;
+  }
+  
+  .detalle-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .detalle-section {
+    padding: 20px;
+  }
+  
+  .modal-detalle-header {
+    padding: 20px;
+  }
+  
+  .modal-detalle-header h2 {
+    font-size: 18px;
+  }
+  
+  .tabla-platos {
+    font-size: 12px;
+  }
+  
+  .tabla-platos th,
+  .tabla-platos td {
+    padding: 8px 6px;
+  }
+}
+
+/* =========================
    Toast
 ========================= */
 

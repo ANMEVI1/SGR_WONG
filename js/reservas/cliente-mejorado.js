@@ -66,6 +66,7 @@
         }
 
         console.log('=== Sistema de Reservas Mejorado Inicializado ===');
+        console.log('Usuario autenticado:', elementos.btnsReservaTipo.length > 0);
 
         // Cachear elementos
         cachearElementos();
@@ -84,7 +85,9 @@
         elementos.selectPersonas?.addEventListener('change', calcularTotalSenal);
         elementos.inputMetodoPago?.addEventListener('change', mostrarInstruccionesPago);
         elementos.checkIncluirPlatos?.addEventListener('change', toggleSelectorPlatos);
-        elementos.inputFecha?.addEventListener('change', validarFechaSeleccionada);
+        
+        // Validar fecha solo al perder foco (blur) no en cada cambio
+        elementos.inputFecha?.addEventListener('blur', validarFechaSeleccionada);
         elementos.inputHora?.addEventListener('change', validarHoraSeleccionada);
 
         console.log('Estado inicial:', estado);
@@ -126,19 +129,19 @@
                 if (estado.reservaParaMi) {
                     elementos.datosContacto.style.display = 'none';
                     // Remover required de campos ocultos
-                    elementos.inputNombre.removeAttribute('required');
-                    elementos.inputCorreo.removeAttribute('required');
-                    elementos.inputTelefono.removeAttribute('required');
+                    if (elementos.inputNombre) elementos.inputNombre.removeAttribute('required');
+                    if (elementos.inputCorreo) elementos.inputCorreo.removeAttribute('required');
+                    if (elementos.inputTelefono) elementos.inputTelefono.removeAttribute('required');
                 } else {
                     elementos.datosContacto.style.display = 'block';
                     // Agregar required a campos visibles
-                    elementos.inputNombre.setAttribute('required', 'required');
-                    elementos.inputCorreo.setAttribute('required', 'required');
-                    elementos.inputTelefono.setAttribute('required', 'required');
+                    if (elementos.inputNombre) elementos.inputNombre.setAttribute('required', 'required');
+                    if (elementos.inputCorreo) elementos.inputCorreo.setAttribute('required', 'required');
+                    if (elementos.inputTelefono) elementos.inputTelefono.setAttribute('required', 'required');
                     // Limpiar campos
-                    elementos.inputNombre.value = '';
-                    elementos.inputCorreo.value = '';
-                    elementos.inputTelefono.value = '';
+                    if (elementos.inputNombre) elementos.inputNombre.value = '';
+                    if (elementos.inputCorreo) elementos.inputCorreo.value = '';
+                    if (elementos.inputTelefono) elementos.inputTelefono.value = '';
                 }
 
                 console.log('Reserva para:', estado.reservaParaMi ? 'Usuario autenticado' : 'Otra persona');
@@ -148,21 +151,27 @@
 
     // ========== CARGAR DATOS DEL CLIENTE ==========
     async function cargarDatosCliente() {
+        // Si ya hay datos en los inputs hidden, no hacer fetch
+        const nombreActual = document.getElementById('clienteNombre')?.value;
+        if (nombreActual && nombreActual.trim() !== '') {
+            console.log('Datos del cliente ya cargados desde PHP');
+            return;
+        }
+        
         try {
             const response = await fetch(CONFIG.API_CLIENTE);
             const result = await response.json();
 
             if (result.success && result.data) {
                 const cliente = result.data;
-                // Guardar en inputs hidden
                 document.getElementById('clienteNombre').value = cliente.nombre || '';
                 document.getElementById('clienteCorreo').value = cliente.correo || '';
                 document.getElementById('clienteTelefono').value = cliente.telefono || '';
                 
-                console.log('Datos del cliente cargados:', cliente);
+                console.log('Datos del cliente cargados desde API:', cliente);
             }
         } catch (error) {
-            console.warn('No se pudieron cargar datos del cliente:', error);
+            console.warn('No se pudieron cargar datos del cliente desde API:', error);
         }
     }
 
@@ -349,7 +358,14 @@
 
     // ========== VALIDAR FECHA SELECCIONADA ==========
     function validarFechaSeleccionada(e) {
-        const fechaSeleccionada = new Date(e.target.value + 'T00:00:00');
+        const fechaInput = e.target.value;
+        
+        // Si está vacío o incompleto, no validar aún
+        if (!fechaInput || fechaInput.length < 10) {
+            return true;
+        }
+        
+        const fechaSeleccionada = new Date(fechaInput + 'T00:00:00');
         const hoy = new Date();
         hoy.setHours(0, 0, 0, 0);
 
@@ -382,8 +398,8 @@
     async function handleSubmit(e) {
         e.preventDefault();
 
-        console.log('=== Enviando reserva mejorada ===');
-        console.log('Estado actual:', estado);
+            console.log('=== Enviando reserva mejorada ===');
+            console.log('Estado actual:', estado);
 
         // Validaciones
         if (!validarFormularioCompleto()) {
@@ -435,13 +451,13 @@
             formData.append('nombre', document.getElementById('clienteNombre').value);
             formData.append('correo', document.getElementById('clienteCorreo').value);
             formData.append('telefono', document.getElementById('clienteTelefono').value);
-            console.log('📝 Usando datos del usuario autenticado');
+                console.log('📝 Usando datos del usuario autenticado');
         } else {
             // ✅ Opción: Para otra persona
             formData.append('nombre', elementos.inputNombre.value);
             formData.append('correo', elementos.inputCorreo.value);
             formData.append('telefono', elementos.inputTelefono.value);
-            console.log('📝 Usando datos del formulario manual');
+                console.log('📝 Usando datos del formulario manual');
         }
 
         // Datos de la reserva
@@ -494,19 +510,17 @@
             modalAnterior.remove();
         }
         
-        // Verificar disponibilidad del módulo del modal
-        if (typeof ModalConfirmacionReserva === 'undefined' || typeof ModalConfirmacionReserva.mostrar !== 'function') {
+        // Verificar si existe globalmente el objeto ModalConfirmacionReserva
+        if (typeof window.ModalConfirmacionReserva === 'object' && window.ModalConfirmacionReserva !== null) {
+            try {
+                window.ModalConfirmacionReserva.mostrar(data);
+                console.log('✅ Modal mostrado correctamente');
+            } catch (error) {
+                console.error('❌ Error al mostrar modal:', error);
+                mostrarExitoFallback(data);
+            }
+        } else {
             console.warn('⚠️ Módulo modal no disponible, usando fallback');
-            mostrarExitoFallback(data);
-            return;
-        }
-        
-        try {
-            // ✅ Reutilizar el mismo modal para ambos casos
-            ModalConfirmacionReserva.mostrar(data);
-            console.log('✅ Modal mostrado correctamente');
-        } catch (error) {
-            console.error('❌ Error al mostrar modal:', error);
             mostrarExitoFallback(data);
         }
     }

@@ -592,7 +592,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function verDetalleReserva(reservaId) {
+    console.log('=== VER DETALLE RESERVA ===');
+    console.log('ReservaID:', reservaId);
+    
     const apiUrl = `${appRoot}api/reservas/detalle-reserva.php?id=${reservaId}`;
+    console.log('URL API:', apiUrl);
+    
+    // Mostrar loading state
+    const loadingToast = showToast('Cargando detalles...');
     
     try {
       const response = await fetch(apiUrl, {
@@ -600,15 +607,28 @@ document.addEventListener("DOMContentLoaded", () => {
         credentials: "same-origin"
       });
       
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
       const result = await response.json();
+      console.log('Result completo:', result);
       
       if (result.success && result.data) {
+        console.log('Detalle de reserva:', result.data);
         mostrarModalDetalle(result.data);
       } else {
+        console.warn('API retornó success=false:', result);
         showToast(result.message || "Error al cargar detalles");
       }
     } catch (error) {
-      console.error("Error cargando detalle:", error);
+      console.error('=== ERROR EN verDetalleReserva ===');
+      console.error('Error:', error);
+      console.error('Mensaje:', error.message);
+      console.error('Stack:', error.stack);
       showToast("Error al cargar detalles de reserva");
     }
   }
@@ -621,9 +641,15 @@ document.addEventListener("DOMContentLoaded", () => {
       "Completada": "completada"
     };
     const estadoClass = estadoClasses[detalle.estado] || "pendiente";
-    const fecha = new Date(detalle.fecha + "T00:00:00").toLocaleDateString("es-ES", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+    const fecha = new Date(detalle.fecha + "T00:00:00").toLocaleDateString("es-ES", { 
+      weekday: "long", 
+      year: "numeric", 
+      month: "long", 
+      day: "numeric" 
+    });
     
-    const platosHTML = detalle.platos.length > 0 ? `
+    // Manejar platos con validación segura
+    const platosHTML = detalle.platos && Array.isArray(detalle.platos) && detalle.platos.length > 0 ? `
       <div class="detalle-section">
         <h3>Platos Pre-ordenados</h3>
         <table class="tabla-platos">
@@ -638,27 +664,43 @@ document.addEventListener("DOMContentLoaded", () => {
           <tbody>
             ${detalle.platos.map(p => `
               <tr>
-                <td>${p.nombre}</td>
-                <td>${p.cantidad}</td>
-                <td>S/ ${p.precio.toFixed(2)}</td>
-                <td>S/ ${p.subtotal.toFixed(2)}</td>
+                <td>${p.nombre || 'Sin nombre'}</td>
+                <td>${p.cantidad || 0}</td>
+                <td>S/ ${(p.precio || 0).toFixed(2)}</td>
+                <td>S/ ${(p.subtotal || 0).toFixed(2)}</td>
               </tr>
             `).join('')}
           </tbody>
           <tfoot>
             <tr>
               <td colspan="3"><strong>Total Platos:</strong></td>
-              <td><strong>S/ ${detalle.total_platos.toFixed(2)}</strong></td>
+              <td><strong>S/ ${(detalle.total_platos || 0).toFixed(2)}</strong></td>
             </tr>
           </tfoot>
         </table>
       </div>
-    ` : '';
+    ` : `
+      <div class="detalle-section">
+        <h3>Platos Pre-ordenados</h3>
+        <div class="sin-platos-mensaje">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 8px; display: block;">
+            <path d="M12 2v20M2 12h20"/>
+          </svg>
+          No se pre-ordenaron platos para esta reserva
+        </div>
+      </div>
+    `;
+    
+    // Calcular señal con datos reales o estimado
+    const montoSenal = detalle.monto_senal || 0;
+    const senalDisplay = montoSenal > 0 
+      ? `S/ ${montoSenal.toFixed(2)}` 
+      : '<span style="color: var(--gray-400);">Pendiente de confirmación</span>';
     
     const modalHTML = `
       <div class="modal-detalle-reserva" id="modalDetalleReserva">
         <div class="modal-detalle-content">
-          <button class="modal-detalle-close" id="closeDetalleModal">
+          <button class="modal-detalle-close" id="closeDetalleModal" aria-label="Cerrar">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M18 6 6 18M6 6l12 12"/>
             </svg>
@@ -672,7 +714,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="detalle-section">
             <h3>Información de la Reserva</h3>
             <div class="detalle-grid">
-              <div class="detalle-item">
+              <div class="detalle-item full">
                 <span class="detalle-label">Fecha:</span>
                 <span class="detalle-value">${fecha}</span>
               </div>
@@ -684,16 +726,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 <span class="detalle-label">Comensales:</span>
                 <span class="detalle-value">${detalle.personas} ${detalle.personas === 1 ? 'persona' : 'personas'}</span>
               </div>
-              <div class="detalle-item">
+              <div class="detalle-item full">
                 <span class="detalle-label">Señal pagada:</span>
-                <span class="detalle-value">S/ ${detalle.monto_senal.toFixed(2)}</span>
+                <span class="detalle-value">${senalDisplay}</span>
               </div>
             </div>
           </div>
           
           ${platosHTML}
           
-          ${detalle.observaciones ? `
+          ${detalle.observaciones && detalle.observaciones.trim() !== '' ? `
             <div class="detalle-section">
               <h3>Observaciones</h3>
               <p class="detalle-observaciones">${detalle.observaciones}</p>
@@ -705,15 +747,15 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="detalle-grid">
               <div class="detalle-item">
                 <span class="detalle-label">Nombre:</span>
-                <span class="detalle-value">${detalle.cliente.nombre}</span>
+                <span class="detalle-value">${detalle.cliente.nombre || 'No especificado'}</span>
               </div>
               <div class="detalle-item">
                 <span class="detalle-label">Teléfono:</span>
-                <span class="detalle-value">${detalle.cliente.telefono}</span>
+                <span class="detalle-value">${detalle.cliente.telefono || 'No especificado'}</span>
               </div>
               <div class="detalle-item full">
                 <span class="detalle-label">Correo:</span>
-                <span class="detalle-value">${detalle.cliente.correo}</span>
+                <span class="detalle-value">${detalle.cliente.correo || 'No especificado'}</span>
               </div>
             </div>
           </div>
@@ -726,7 +768,22 @@ document.addEventListener("DOMContentLoaded", () => {
     modalContainer.innerHTML = modalHTML;
     document.body.appendChild(modalContainer);
     
-    // Agregar event listener para cerrar
+    // Prevenir scroll del body cuando el modal está abierto
+    document.body.style.overflow = 'hidden';
+    
+    // Función para cerrar el modal
+    const cerrarModal = () => {
+      const modal = document.getElementById('modalDetalleReserva');
+      if (modal) {
+        modal.classList.remove('show');
+        document.body.style.overflow = '';
+        setTimeout(() => {
+          modalContainer.remove();
+        }, 320); // Debe coincidir con var(--t-slow)
+      }
+    };
+    
+    // Agregar event listeners
     setTimeout(() => {
       const modal = document.getElementById('modalDetalleReserva');
       const closeBtn = document.getElementById('closeDetalleModal');
@@ -735,17 +792,25 @@ document.addEventListener("DOMContentLoaded", () => {
         modal.classList.add('show');
       }
       
-      closeBtn?.addEventListener('click', () => {
-        modal?.classList.remove('show');
-        setTimeout(() => modalContainer.remove(), 300);
-      });
+      // Cerrar con botón X
+      closeBtn?.addEventListener('click', cerrarModal);
       
+      // Cerrar con click fuera del modal
       modal?.addEventListener('click', (e) => {
         if (e.target === modal) {
-          modal.classList.remove('show');
-          setTimeout(() => modalContainer.remove(), 300);
+          cerrarModal();
         }
       });
+      
+      // Cerrar con tecla Escape
+      const handleEscape = (e) => {
+        if (e.key === 'Escape') {
+          cerrarModal();
+          document.removeEventListener('keydown', handleEscape);
+        }
+      };
+      document.addEventListener('keydown', handleEscape);
+      
     }, 10);
   }
 

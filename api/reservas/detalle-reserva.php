@@ -57,7 +57,6 @@ try {
             r.Num_Comensales,
             r.Observaciones,
             r.Estado,
-            r.Monto_Senal,
             r.Fecha_Creacion,
             c.Nombre_Apellidos,
             c.Telefono,
@@ -72,31 +71,9 @@ try {
         Response::error('Reserva no encontrada', 404);
     }
     
-    // Obtener platos pre-ordenados
-    $platos = $db->fetchAll(
-        "SELECT 
-            p.Nombre as nombre_plato,
-            p.Precio_Unitario as precio,
-            drp.Cantidad as cantidad,
-            (p.Precio_Unitario * drp.Cantidad) as subtotal
-         FROM Detalle_Reserva_Plato drp
-         INNER JOIN Plato p ON drp.PlatoID = p.PlatoID
-         WHERE drp.ReservaID = ?",
-        [$reservaID]
-    );
-    
-    $platosFormateados = array_map(function($p) {
-        return [
-            'nombre' => $p['nombre_plato'],
-            'precio' => (float)$p['precio'],
-            'cantidad' => (int)$p['cantidad'],
-            'subtotal' => (float)$p['subtotal']
-        ];
-    }, $platos);
-    
-    $totalPlatos = array_reduce($platosFormateados, function($carry, $p) {
-        return $carry + $p['subtotal'];
-    }, 0);
+    // NOTA: Tabla Detalle_Reserva_Plato no existe aún en BD.
+    // Los platos pre-ordenados no se persisten actualmente (solo viajan en el POST de crear.php como JSON y se loguean).
+    // Cuando se implemente la tabla, descomentar el bloque de abajo.
     
     $detalle = [
         'id' => (int)$reserva['ReservaID'],
@@ -106,15 +83,15 @@ try {
         'personas' => (int)$reserva['Num_Comensales'],
         'observaciones' => $reserva['Observaciones'] ?? '',
         'estado' => $reserva['Estado'],
-        'monto_senal' => (float)$reserva['Monto_Senal'],
+        'monto_senal' => (float)$reserva['Num_Comensales'] * 11.00, // Calcular con constante
         'fecha_creacion' => $reserva['Fecha_Creacion'],
         'cliente' => [
             'nombre' => $reserva['Nombre_Apellidos'],
             'telefono' => $reserva['Telefono'],
             'correo' => $reserva['Correo']
         ],
-        'platos' => $platosFormateados,
-        'total_platos' => $totalPlatos
+        'platos' => [],
+        'total_platos' => 0.00
     ];
     
     Response::success($detalle, 'Detalle obtenido exitosamente');

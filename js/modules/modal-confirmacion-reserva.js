@@ -30,7 +30,7 @@ const ModalConfirmacionReserva = (function() {
             color: '#00D4B4',
             numero: '991 183 777',
             titular: 'Chifa Matsue',
-            qr: 'assets/qr/plin-qr.png',
+            qr: 'assets/qr/yape-qr.png',
             instrucciones: [
                 'Abre tu app de Plin',
                 'Selecciona "Enviar"',
@@ -262,7 +262,7 @@ const ModalConfirmacionReserva = (function() {
         if (metodoPago.qr) {
             html += `
                 <div class="reserva-qr-container">
-                    <img src="${metodoPago.qr}" alt="QR ${metodoPago.nombre}" onerror="this.src='assets/img/qr-placeholder.png'">
+                    <img src="${metodoPago.qr}" alt="QR ${metodoPago.nombre}" style="max-width: 280px; height: auto; display: block; margin: 0 auto;">
                     <div class="qr-label">Escanea este código QR</div>
                 </div>
                 <div class="reserva-datos-pago">
