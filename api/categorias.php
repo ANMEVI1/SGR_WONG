@@ -5,7 +5,9 @@
 require_once __DIR__ . '/../config/conexion.php';
 
 header('Content-Type: application/json; charset=utf-8');
-header('Cache-Control: public, max-age=300'); // Cache 5 minutos
+header('Cache-Control: no-store, no-cache, must-revalidate');
+header('Pragma: no-cache');
+header('Expires: 0');
 header('Access-Control-Allow-Origin: *');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -22,6 +24,7 @@ try {
             WHERE cat.Tipo = 'Plato' 
               AND pl.Estado = 'Disponible'
             GROUP BY cat.CatID, cat.Nombre, cat.Descripcion
+            HAVING COUNT(pl.PlatoID) > 0
             ORDER BY cat.Nombre ASC";
     
     $categorias = $db->fetchAll($sql);

@@ -15,7 +15,9 @@
         HORARIO_APERTURA: 11,
         HORARIO_CIERRE: 22,
         SENAL_POR_PERSONA: 11.00,
-        PORCENTAJE_SENAL_PLATOS: 30  // 30% del subtotal de platos
+        PORCENTAJE_SENAL_PLATOS: 30,  // 30% del subtotal de platos
+        STORAGE_KEY: 'reserva_progreso',  // Clave para localStorage
+        AUTO_SAVE_DELAY: 1000  // Guardar cada 1 segundo
     };
 
     // ========== ESTADO GLOBAL ==========
@@ -26,6 +28,8 @@
         numPersonas: 0,
         totalSenal: 0
     };
+    
+    let autoSaveTimer = null;
 
     // ========== ELEMENTOS DEL DOM ==========
     const elementos = {
@@ -67,9 +71,29 @@
 
         console.log('=== Sistema de Reservas Mejorado Inicializado ===');
         console.log('Usuario autenticado:', elementos.btnsReservaTipo.length > 0);
-
-        // Cachear elementos
+        console.log('VERSION: 2.0 - LocalStorage ACTIVO');
+        
+        // Cachear elementos PRIMERO
         cachearElementos();
+        
+        // DEBUG: Verificar elementos cacheados
+        console.log('ELEMENTOS CACHEADOS:', {
+            fecha: !!elementos.inputFecha,
+            hora: !!elementos.inputHora,
+            personas: !!elementos.selectPersonas,
+            metodoPago: !!elementos.inputMetodoPago
+        });
+        
+        // DEBUG: Verificar localStorage
+        console.log('LOCALSTORAGE OK:', typeof(Storage) !== 'undefined');
+        const progresoActual = localStorage.getItem(CONFIG.STORAGE_KEY);
+        console.log('PROGRESO EXISTENTE:', progresoActual ? 'SI' : 'NO');
+        if (progresoActual) {
+            console.log('DATOS:', JSON.parse(progresoActual));
+        }
+        
+        // 🔄 Verificar si hay progreso guardado (DESPUÉS de cachear elementos)
+        verificarProgresoGuardado();
 
         // Si hay usuario autenticado, cargar sus datos
         if (elementos.btnsReservaTipo.length > 0) {
@@ -82,15 +106,262 @@
 
         // Event listeners
         elementos.form.addEventListener('submit', handleSubmit);
-        elementos.selectPersonas?.addEventListener('change', calcularTotalSenal);
-        elementos.inputMetodoPago?.addEventListener('change', mostrarInstruccionesPago);
+        elementos.selectPersonas?.addEventListener('change', () => {
+            console.log('🔔 Cambio en personas, guardando...');
+            calcularTotalSenal();
+            guardarProgreso();
+        });
+        elementos.inputMetodoPago?.addEventListener('change', () => {
+            console.log('🔔 Cambio en método pago, guardando...');
+            mostrarInstruccionesPago();
+            calcularTotalSenal();
+            guardarProgreso();
+        });
         elementos.checkIncluirPlatos?.addEventListener('change', toggleSelectorPlatos);
         
         // Validar fecha solo al perder foco (blur) no en cada cambio
         elementos.inputFecha?.addEventListener('blur', validarFechaSeleccionada);
-        elementos.inputHora?.addEventListener('change', validarHoraSeleccionada);
+        elementos.inputFecha?.addEventListener('change', () => {
+            console.log('🔔 Cambio en fecha, guardando...');
+            guardarProgreso();
+        });
+        elementos.inputHora?.addEventListener('change', () => {
+            console.log('🔔 Cambio en hora, guardando...');
+            validarHoraSeleccionada();
+            guardarProgreso();
+        });
+        
+        // Autosave en campos de texto
+        if (elementos.inputNombre) elementos.inputNombre.addEventListener('input', autoGuardarProgreso);
+        if (elementos.inputCorreo) elementos.inputCorreo.addEventListener('input', autoGuardarProgreso);
+        if (elementos.inputTelefono) elementos.inputTelefono.addEventListener('input', autoGuardarProgreso);
+        elementos.form.querySelector('textarea[name="comentarios"]')?.addEventListener('input', autoGuardarProgreso);
 
+        console.log('✅ Listeners configurados');
         console.log('Estado inicial:', estado);
+    }
+
+    // ========== LOCAL STORAGE: VERIFICAR PROGRESO GUARDADO ==========
+    function verificarProgresoGuardado() {
+        console.log('🔍 Verificando progreso guardado...');
+        const progresoGuardado = localStorage.getItem(CONFIG.STORAGE_KEY);
+        
+        if (!progresoGuardado) {
+            console.log('❌ No hay progreso guardado');
+            return;
+        }
+        
+        console.log('✅ Progreso encontrado en localStorage');
+        
+        try {
+            const progreso = JSON.parse(progresoGuardado);
+            console.log('📦 Progreso parseado:', progreso);
+            
+            const fechaGuardado = new Date(progreso.timestamp);
+            const ahora = new Date();
+            const horasPasadas = (ahora - fechaGuardado) / (1000 * 60 * 60);
+            
+            console.log(`⏱️ Tiempo transcurrido: ${horasPasadas.toFixed(2)} horas`);
+            
+            // Si han pasado más de 24 horas, eliminar progreso
+            if (horasPasadas > 24) {
+                localStorage.removeItem(CONFIG.STORAGE_KEY);
+                console.log('✅ Progreso expirado eliminado');
+                return;
+            }
+            
+            // Mostrar advertencia
+            console.log('📢 Mostrando alerta de progreso guardado...');
+            const restaurar = confirm(
+                '📢 ¡Tienes una reserva sin completar!\n\n' +
+                'Encontramos datos de una reserva que no terminaste.\n' +
+                `Guardado hace ${Math.round(horasPasadas * 60)} minutos.\n\n` +
+                '¿Deseas continuar donde lo dejaste?\n\n' +
+                '✅ Aceptar = Recuperar datos\n' +
+                '❌ Cancelar = Empezar desde cero'
+            );
+            
+            if (restaurar) {
+                console.log('✅ Usuario acepta restaurar');
+                restaurarProgreso(progreso);
+            } else {
+                console.log('❌ Usuario rechaza restaurar');
+                localStorage.removeItem(CONFIG.STORAGE_KEY);
+                console.log('🗑️ Progreso eliminado por el usuario');
+            }
+            
+        } catch (error) {
+            console.error('❌ Error al verificar progreso:', error);
+            localStorage.removeItem(CONFIG.STORAGE_KEY);
+        }
+    }
+    
+    // ========== LOCAL STORAGE: RESTAURAR PROGRESO ==========
+    function restaurarProgreso(progreso) {
+        // Restaurar campos de fecha/hora/personas
+        if (progreso.fecha && elementos.inputFecha) {
+            elementos.inputFecha.value = progreso.fecha;
+        }
+        if (progreso.hora && elementos.inputHora) {
+            elementos.inputHora.value = progreso.hora;
+        }
+        if (progreso.personas && elementos.selectPersonas) {
+            elementos.selectPersonas.value = progreso.personas;
+        }
+        if (progreso.comentarios) {
+            const textarea = elementos.form.querySelector('textarea[name="comentarios"]');
+            if (textarea) textarea.value = progreso.comentarios;
+        }
+        if (progreso.metodo_pago && elementos.inputMetodoPago) {
+            elementos.inputMetodoPago.value = progreso.metodo_pago;
+        }
+        
+        // Restaurar campos de contacto (solo si es para otra persona)
+        if (progreso.tipo === 'otro') {
+            if (elementos.btnsReservaTipo.length > 0) {
+                // Simular click en "Para otra persona"
+                const btnOtro = Array.from(elementos.btnsReservaTipo).find(b => b.dataset.tipo === 'otro');
+                if (btnOtro) btnOtro.click();
+            }
+            
+            if (progreso.nombre && elementos.inputNombre) {
+                elementos.inputNombre.value = progreso.nombre;
+            }
+            if (progreso.correo && elementos.inputCorreo) {
+                elementos.inputCorreo.value = progreso.correo;
+            }
+            if (progreso.telefono && elementos.inputTelefono) {
+                elementos.inputTelefono.value = progreso.telefono;
+            }
+        }
+        
+        // Restaurar platos seleccionados
+        if (progreso.platos && progreso.platos.length > 0) {
+            estado.platosSeleccionados = progreso.platos;
+            if (elementos.checkIncluirPlatos) {
+                elementos.checkIncluirPlatos.checked = true;
+                toggleSelectorPlatos();
+            }
+            actualizarResumenPlatos();
+        }
+        
+        // Recalcular totales
+        calcularTotalSenal();
+        mostrarInstruccionesPago();
+        
+        // Mostrar mensaje de éxito
+        mostrarNotificacion('✅ Progreso restaurado correctamente', 'success');
+    }
+    
+    // ========== LOCAL STORAGE: GUARDAR PROGRESO ==========
+    function guardarProgreso() {
+        try {
+            const progreso = {
+                timestamp: new Date().toISOString(),
+                tipo: estado.reservaParaMi ? 'yo' : 'otro',
+                fecha: elementos.inputFecha?.value || '',
+                hora: elementos.inputHora?.value || '',
+                personas: elementos.selectPersonas?.value || '',
+                comentarios: elementos.form.querySelector('textarea[name="comentarios"]')?.value || '',
+                metodo_pago: elementos.inputMetodoPago?.value || '',
+                platos: estado.platosSeleccionados
+            };
+            
+            // Solo guardar si es "para otra persona"
+            if (!estado.reservaParaMi) {
+                progreso.nombre = elementos.inputNombre?.value || '';
+                progreso.correo = elementos.inputCorreo?.value || '';
+                progreso.telefono = elementos.inputTelefono?.value || '';
+            }
+            
+            // Solo guardar si hay al menos un campo con datos
+            const tieneProgreso = progreso.fecha || progreso.hora || progreso.personas || 
+                                  progreso.comentarios || progreso.platos.length > 0 ||
+                                  progreso.nombre || progreso.correo || progreso.telefono ||
+                                  progreso.metodo_pago;
+            
+            if (tieneProgreso) {
+                localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(progreso));
+                console.log('💾 Progreso guardado:', progreso);
+                mostrarIndicadorGuardado();
+            }
+            
+        } catch (error) {
+            console.warn('⚠️ No se pudo guardar progreso:', error);
+        }
+    }
+    
+    // ========== LOCAL STORAGE: AUTOSAVE CON DEBOUNCE ==========
+    function autoGuardarProgreso() {
+        clearTimeout(autoSaveTimer);
+        autoSaveTimer = setTimeout(() => {
+            guardarProgreso();
+        }, CONFIG.AUTO_SAVE_DELAY);
+    }
+    
+    // ========== INDICADOR VISUAL DE GUARDADO ==========
+    function mostrarIndicadorGuardado() {
+        // Verificar si ya existe indicador
+        let indicador = document.getElementById('indicadorGuardado');
+        
+        if (!indicador) {
+            indicador = document.createElement('div');
+            indicador.id = 'indicadorGuardado';
+            indicador.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                padding: 8px 15px;
+                background: rgba(40, 167, 69, 0.95);
+                color: white;
+                border-radius: 5px;
+                font-size: 13px;
+                font-weight: 600;
+                z-index: 9999;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            `;
+            indicador.innerHTML = '<i class="fas fa-check-circle"></i> Progreso guardado';
+            document.body.appendChild(indicador);
+        }
+        
+        // Mostrar
+        setTimeout(() => indicador.style.opacity = '1', 10);
+        
+        // Ocultar después de 2 segundos
+        setTimeout(() => {
+            indicador.style.opacity = '0';
+        }, 2000);
+    }
+    
+    // ========== NOTIFICACIÓN TOAST ==========
+    function mostrarNotificacion(mensaje, tipo = 'info') {
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 20px;
+            background: ${tipo === 'success' ? '#28a745' : '#17a2b8'};
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 10000;
+            animation: slideInRight 0.3s ease;
+            font-weight: 600;
+        `;
+        toast.textContent = mensaje;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.animation = 'slideOutRight 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
     }
 
     // ========== CACHEAR ELEMENTOS ==========
@@ -145,6 +416,7 @@
                 }
 
                 console.log('Reserva para:', estado.reservaParaMi ? 'Usuario autenticado' : 'Otra persona');
+                guardarProgreso(); // Guardar al cambiar tipo de reserva
             });
         });
     }
@@ -255,6 +527,7 @@
         }
 
         actualizarResumenPlatos();
+        guardarProgreso(); // Guardar al agregar plato
     }
 
     // ========== ACTUALIZAR RESUMEN DE PLATOS ==========
@@ -303,12 +576,25 @@
     function quitarPlato(index) {
         estado.platosSeleccionados.splice(index, 1);
         actualizarResumenPlatos();
+        guardarProgreso(); // Guardar al quitar plato
     }
 
     // ========== CALCULAR TOTAL SEÑAL (Mejorado con platos) ==========
     function calcularTotalSenal() {
         const personas = parseInt(elementos.selectPersonas.value) || 0;
         estado.numPersonas = personas;
+        
+        // Verificar si el método es efectivo (no requiere señal)
+        const metodo = elementos.inputMetodoPago?.value;
+        if (metodo === 'efectivo') {
+            estado.totalSenal = 0;
+            elementos.totalSenalSpan.textContent = '0.00';
+            if (elementos.desgloseSenalPreview) {
+                elementos.desgloseSenalPreview.style.display = 'none';
+            }
+            console.log('💵 Método: Efectivo - Sin señal requerida');
+            return;
+        }
         
         // Base: S/11 por persona
         let senalBase = personas * CONFIG.SENAL_POR_PERSONA;
@@ -342,7 +628,48 @@
     // ========== MOSTRAR INSTRUCCIONES DE PAGO ==========
     function mostrarInstruccionesPago() {
         const metodo = elementos.inputMetodoPago.value;
-        elementos.instruccionesPago.style.display = metodo ? 'block' : 'none';
+        
+        // Si es efectivo, ocultar toda la sección de señal
+        const seccionSenal = document.querySelector('.pago-anticipado');
+        if (metodo === 'efectivo') {
+            // Ocultar cálculo de señal y mostrar mensaje informativo
+            if (seccionSenal) {
+                const montoSenal = seccionSenal.querySelector('#montoSenal');
+                if (montoSenal) {
+                    montoSenal.style.display = 'none';
+                }
+            }
+            elementos.instruccionesPago.style.display = 'block';
+            elementos.instruccionesPago.innerHTML = `
+                <p style="margin: 0; font-size: 13px; color: #0c5460;">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Pago en local:</strong> No requiere señal anticipada. Pagarás el total al llegar al restaurante.
+                </p>
+            `;
+        } else if (metodo) {
+            // Métodos con señal anticipada
+            if (seccionSenal) {
+                const montoSenal = seccionSenal.querySelector('#montoSenal');
+                if (montoSenal) {
+                    montoSenal.style.display = 'block';
+                }
+            }
+            elementos.instruccionesPago.style.display = 'block';
+            elementos.instruccionesPago.innerHTML = `
+                <p style="margin: 0; font-size: 13px; color: #0c5460;">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Nota:</strong> Después de confirmar la reserva, te enviaremos las instrucciones de pago a tu correo.
+                </p>
+            `;
+        } else {
+            elementos.instruccionesPago.style.display = 'none';
+            if (seccionSenal) {
+                const montoSenal = seccionSenal.querySelector('#montoSenal');
+                if (montoSenal) {
+                    montoSenal.style.display = 'block';
+                }
+            }
+        }
     }
 
     // ========== CONFIGURAR FECHA MÍNIMA ==========
@@ -380,7 +707,7 @@
 
     // ========== VALIDAR HORA SELECCIONADA ==========
     function validarHoraSeleccionada(e) {
-        const horaSeleccionada = e.target.value;
+        const horaSeleccionada = elementos.inputHora?.value || (e ? e.target.value : '');
         if (!horaSeleccionada) return true;
 
         const [hora, minuto] = horaSeleccionada.split(':').map(Number);
@@ -424,6 +751,10 @@
             console.log('Resultado:', result);
 
             if (result.success) {
+                // ✅ Limpiar localStorage al completar reserva exitosamente
+                localStorage.removeItem(CONFIG.STORAGE_KEY);
+                console.log('🗑️ Progreso eliminado tras éxito');
+                
                 mostrarExito(result);
                 elementos.form.reset();
                 estado.platosSeleccionados = [];
@@ -540,7 +871,13 @@
 
 `;
         
-        if (data.total_senal > 0) {
+        if (data.metodo_pago === 'efectivo') {
+            mensaje += `PAGO EN LOCAL
+`;
+            mensaje += `Pagarás el total al llegar al restaurante.
+
+`;
+        } else if (data.total_senal > 0) {
             mensaje += `SEÑAL A PAGAR
 `;
             mensaje += `Monto: S/ ${data.total_senal.toFixed(2)}
@@ -584,6 +921,7 @@
     // ========== FORMATEAR MÉTODO DE PAGO ==========
     function formatearMetodoPago(metodo) {
         const metodos = {
+            'efectivo': 'Efectivo - Pago en local',
             'yape': 'Yape',
             'plin': 'Plin',
             'transferencia': 'Transferencia Bancaria',

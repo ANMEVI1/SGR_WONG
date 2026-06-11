@@ -26,7 +26,12 @@ if ($esEditar) {
     if (!$plato) { header('Location: index.php'); exit; }
 
     $variantes = $db->fetchAll(
-        "SELECT * FROM Plato_Variante WHERE PlatoID = :id ORDER BY Precio_Venta ASC",
+        "SELECT * FROM Plato_Variante WHERE PlatoID = :id AND Estado = 1 ORDER BY Precio_Venta ASC",
+        [':id' => $platoID]
+    );
+    
+    $variantesInactivas = $db->fetchAll(
+        "SELECT * FROM Plato_Variante WHERE PlatoID = :id AND Estado = 0 ORDER BY Precio_Venta ASC",
         [':id' => $platoID]
     );
 }
@@ -132,17 +137,19 @@ $categorias = $db->fetchAll(
                     </label>
                 </div>
 
+
+
                 <hr class="section-sep">
 
                 <div class="field full">
                     <label>Imagen del plato</label>
                     <?php if (!empty($plato['Imagen_URL'])): ?>
                         <img class="preview-img" id="imgPreview"
-                             src="../../../<?= htmlspecialchars($plato['Imagen_URL'], ENT_QUOTES, 'UTF-8') ?>"
-                             alt="preview" onerror="this.src='../../../assets/img/platos/default.jpg'">
+                             src="../../../<?= htmlspecialchars($plato['Imagen_URL'], ENT_QUOTES, 'UTF-8') ?>" 
+                             alt="preview" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27100%27 height=%27100%27%3E%3Crect fill=%27%23f0ece4%27 width=%27100%27 height=%27100%27/%3E%3Ctext fill=%27%23c9954a%27 font-size=%2714%27 font-weight=%27bold%27 x=%2750%25%27 y=%2750%25%27 text-anchor=%27middle%27 dominant-baseline=%27middle%27%3E?%3C/text%3E%3C/svg%3E';">
                     <?php else: ?>
                         <img class="preview-img" id="imgPreview"
-                             src="../../../assets/img/platos/default.jpg" alt="preview">
+                             src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23f0ece4' width='100' height='100'/%3E%3Ctext fill='%23c9954a' font-size='14' font-weight='bold' x='50%25' y='50%25' text-anchor='middle' dominant-baseline='middle'%3E?%3C/text%3E%3C/svg%3E" alt="preview">
                     <?php endif; ?>
                     <input type="file" name="imagen" accept="image/*" id="inputImagen" style="margin-top:8px;">
                     <small style="color:#999;margin-top:4px;">JPG/PNG/WEBP. Máx 2MB. Deja vacío para mantener la actual.</small>
@@ -182,6 +189,11 @@ $categorias = $db->fetchAll(
                     <button type="button" class="btn btn-ghost" style="margin-top:8px;" onclick="agregarVariante()">
                         <i class="fas fa-plus"></i> Agregar variante
                     </button>
+                    <?php if (!empty($variantesInactivas)): ?>
+                        <button type="button" class="btn btn-ghost" style="margin-top:8px;background:#f0f0f0;" onclick="mostrarInactivas()">
+                            <i class="fas fa-redo"></i> Reactivar (<?= count($variantesInactivas) ?>)
+                        </button>
+                    <?php endif; ?>
                 </div>
 
                 <div class="actions full">
@@ -223,6 +235,28 @@ function quitarVariante(btn) {
     const rows = document.querySelectorAll('.variante-row');
     if (rows.length <= 1) { alert('Debe haber al menos una variante.'); return; }
     btn.closest('.variante-row').remove();
+}
+
+function mostrarInactivas() {
+    const inactivas = <?= json_encode($variantesInactivas ?? []) ?>;
+    if (!inactivas || inactivas.length === 0) return;
+    
+    const msg = inactivas.map(v => `${v.Nombre} - S/ ${parseFloat(v.Precio_Venta).toFixed(2)}`).join('\n');
+    if (!confirm(`Variantes desactivadas:\n\n${msg}\n\n¿Reactivar alguna?`)) return;
+    
+    inactivas.forEach(v => {
+        const row = document.createElement('div');
+        row.className = 'variante-row';
+        row.innerHTML = `
+            <input type="hidden" name="variante_id[]" value="${v.VarianteID}">
+            <input type="text" name="variante_nombre[]" value="${v.Nombre.replace(/"/g, '&quot;')}" required>
+            <input type="number" name="variante_precio[]" step="0.01" min="0" value="${parseFloat(v.Precio_Venta).toFixed(2)}" required>
+            <button type="button" class="btn-icon" onclick="quitarVariante(this)"><i class="fas fa-trash"></i></button>`;
+        document.getElementById('variantesContainer').appendChild(row);
+    });
+    
+    alert('Variantes reactivadas. Guarda cambios para confirmar.');
+    event.target.remove();
 }
 
 document.getElementById('platoForm').addEventListener('submit', async e => {

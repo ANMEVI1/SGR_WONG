@@ -183,6 +183,65 @@
     font-size: 1.3rem;
 }
 
+/* Sección de modificadores y variantes */
+.variantes-selector {
+    margin: 20px 0;
+}
+
+.variantes-selector h3,
+.modificadores-grupo h3 {
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+    color: var(--text);
+    font-weight: 700;
+}
+
+.modificadores-grupo {
+    margin: 24px 0;
+    padding: 20px;
+    background: var(--bg);
+    border-radius: var(--radius-lg);
+}
+
+.modificador-opcion {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: white;
+    border-radius: var(--radius);
+    cursor: pointer;
+    border: 2px solid var(--border);
+    transition: var(--transition);
+    margin-bottom: 10px;
+}
+
+.modificador-opcion:hover {
+    border-color: var(--primary);
+    background: rgba(222, 83, 2, 0.05);
+}
+
+.modificador-opcion input[type="checkbox"],
+.modificador-opcion input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--primary);
+}
+
+.modificador-opcion label {
+    flex: 1;
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--text);
+}
+
+.modificador-precio {
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
 /* Badges y etiquetas */
 .producto-badges {
     display: flex;

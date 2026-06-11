@@ -169,12 +169,15 @@ $platos = $db->fetchAll(
                     </thead>
                     <tbody>
                         <?php foreach ($platos as $plato): ?>
+                        <?php
+                        $imgSrc = !empty($plato['Imagen_URL']) ? '../../../' . htmlspecialchars($plato['Imagen_URL']) : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Crect fill='%23f0ece4' width='50' height='50'/%3E%3Ctext fill='%23c9954a' font-size='12' font-weight='bold' x='50%25' y='50%25' text-anchor='middle' dominant-baseline='middle'%3E?%3C/text%3E%3C/svg%3E";
+                        ?>
                         <tr data-categoria="<?= $plato['CatID'] ?? '' ?>">
                             <td>
-                                <img src="../../../<?= htmlspecialchars($plato['Imagen_URL'] ?: 'assets/img/platos/default.jpg') ?>"
+                                <img src="<?= $imgSrc ?>"
                                      alt="<?= htmlspecialchars($plato['Nombre']) ?>"
                                      style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;"
-                                     onerror="this.src='../../../assets/img/platos/default.jpg'">
+                                     onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2750%27 height=%2750%27%3E%3Crect fill=%27%23f0ece4%27 width=%2750%27 height=%2750%27/%3E%3Ctext fill=%27%23c9954a%27 font-size=%2712%27 font-weight=%27bold%27 x=%2750%25%27 y=%2750%25%27 text-anchor=%27middle%27 dominant-baseline=%27middle%27%3E?%3C/text%3E%3C/svg%3E';">
                             </td>
                             <td>
                                 <strong><?= htmlspecialchars($plato['Nombre']) ?></strong>

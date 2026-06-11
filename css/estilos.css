@@ -294,70 +294,7 @@ main {
     margin-top: 10px;
 }
 
-/* ===== 7. MINI CARRUSEL ===== */
-.mini-carousel {
-    display: flex;
-    overflow-x: auto;
-    gap: 22px;
-    padding: 20px 0 28px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--gold) #f0f0f0;
-}
 
-.mini-carousel::-webkit-scrollbar { height: 6px; }
-.mini-carousel::-webkit-scrollbar-track { background: #f0f0f0; border-radius: 3px; }
-.mini-carousel::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
-
-.mini-item {
-    min-width: 280px;
-    background: white;
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    box-shadow: var(--shadow);
-    transition: var(--transition);
-    cursor: pointer;
-    border: 1px solid var(--border);
-}
-
-.mini-item:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-lg);
-}
-
-.mini-item img {
-    width: 100%;
-    height: 190px;
-    object-fit: cover;
-    transition: transform 0.5s;
-}
-
-.mini-item:hover img { transform: scale(1.06); }
-
-.mini-item p {
-    padding: 16px 18px 4px;
-    font-weight: 700;
-    font-size: 1rem;
-    color: var(--text);
-}
-
-.mini-item span {
-    display: block;
-    padding: 4px 18px 18px;
-    color: var(--gold-dark);
-    font-size: 1.25rem;
-    font-weight: 800;
-}
-
-.promo-tag {
-    background: #e53e3e;
-    color: white;
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 0.72rem;
-    margin-left: 8px;
-    font-weight: 700;
-    vertical-align: middle;
-}
 
 /* ===== 9. SOBRE NOSOTROS ===== */
 .about {
@@ -772,7 +709,10 @@ main {
 
 @media (max-width: 480px) {
     .hero { min-height: 480px; }
-    .mini-item { min-width: 240px; }
+    .mini-item {
+        min-width: 240px;
+        max-width: 240px;
+    }
     .about-card { padding: 24px 18px; }
 }
 /* ==========================================================

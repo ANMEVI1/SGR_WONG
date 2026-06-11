@@ -67,6 +67,10 @@ $categorias = $db->fetchAll(
             <div class="admin-header">
                 <h1><i class="fas fa-boxes"></i> Gestión de Insumos</h1>
                 <p>Control de inventario y stock de insumos del restaurante</p>
+                <div style="background: #f8d7da; border-left: 4px solid #dc3545; padding: 10px 15px; margin-top: 15px; border-radius: 4px; font-size: 0.85rem;">
+                    <i class="fas fa-exclamation-triangle" style="color: #721c24;"></i> 
+                    <strong>Alerta:</strong> Los insumos con stock crítico aparecen marcados en rojo. Revísalos regularmente para evitar desabastecimiento.
+                </div>
             </div>
 
             <!-- Estadísticas -->
@@ -204,9 +208,20 @@ $categorias = $db->fetchAll(
         </main>
     </div>
 
+    <!-- Modal Ver Detalles Insumo -->
+    <div id="modalDetalles" class="modal" style="display: none;">
+        <div class="modal-content modal-detalles" style="max-width: 700px; max-height: 85vh; overflow-y: auto;">
+            <span class="close" onclick="cerrarModalDetalles()">&times;</span>
+            <div id="detallesContenido"></div>
+            <div style="margin-top: 30px; text-align: right;">
+                <button onclick="cerrarModalDetalles()" class="btn btn-secondary">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Nuevo/Editar Insumo -->
     <div id="modalInsumo" class="modal" style="display: none;">
-        <div class="modal-content" style="max-width: 800px;">
+        <div class="modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
             <span class="close" onclick="cerrarModal()">&times;</span>
             <h2 id="tituloModal">Nuevo Insumo</h2>
             <form id="formInsumo">
@@ -215,12 +230,14 @@ $categorias = $db->fetchAll(
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     <div class="form-group">
                         <label for="nombre">Nombre del Insumo *</label>
-                        <input type="text" id="nombre" name="nombre" class="form-control" required>
+                        <input type="text" id="nombre" name="nombre" class="form-control" required
+                               title="Nombre descriptivo del insumo">
                     </div>
                     
                     <div class="form-group">
                         <label for="categoriaId">Categoría *</label>
-                        <select id="categoriaId" name="categoriaId" class="form-control" required>
+                        <select id="categoriaId" name="categoriaId" class="form-control" required
+                                title="Categoría a la que pertenece el insumo">
                             <option value="">Seleccionar categoría</option>
                             <?php foreach ($categorias as $cat): ?>
                             <option value="<?= $cat['CatID'] ?>"><?= $cat['Nombre'] ?></option>
@@ -230,17 +247,22 @@ $categorias = $db->fetchAll(
                     
                     <div class="form-group" style="grid-column: span 2;">
                         <label for="descripcion">Descripción</label>
-                        <textarea id="descripcion" name="descripcion" class="form-control" rows="2"></textarea>
+                        <textarea id="descripcion" name="descripcion" class="form-control" rows="2"
+                                  placeholder="Descripción opcional del insumo"></textarea>
                     </div>
                     
                     <div class="form-group">
                         <label for="precioCosto">Precio de Costo (S/) *</label>
-                        <input type="number" id="precioCosto" name="precioCosto" class="form-control" step="0.01" min="0" required>
+                        <input type="number" id="precioCosto" name="precioCosto" class="form-control" 
+                               step="0.01" min="0" required
+                               title="Precio de costo unitario del insumo">
+                        <small style="color: #6c757d;">💡 Precio promedio de compra</small>
                     </div>
                     
                     <div class="form-group">
                         <label for="unidadMedida">Unidad de Medida *</label>
-                        <select id="unidadMedida" name="unidadMedida" class="form-control" required>
+                        <select id="unidadMedida" name="unidadMedida" class="form-control" required
+                                title="Unidad en la que se mide el insumo">
                             <option value="">Seleccionar unidad</option>
                             <option value="kg">Kilogramo (kg)</option>
                             <option value="lt">Litro (lt)</option>
@@ -253,18 +275,24 @@ $categorias = $db->fetchAll(
                     
                     <div class="form-group">
                         <label for="stockActual">Stock Actual *</label>
-                        <input type="number" id="stockActual" name="stockActual" class="form-control" step="0.01" min="0" required>
+                        <input type="number" id="stockActual" name="stockActual" class="form-control" 
+                               step="0.01" min="0" required
+                               title="Cantidad disponible actualmente en almacén">
+                        <small style="color: #6c757d;">💡 Cantidad disponible en almacén</small>
                     </div>
                     
                     <div class="form-group">
                         <label for="stockMinimo">Stock Mínimo *</label>
-                        <input type="number" id="stockMinimo" name="stockMinimo" class="form-control" step="0.01" min="0" required>
+                        <input type="number" id="stockMinimo" name="stockMinimo" class="form-control" 
+                               step="0.01" min="0" required
+                               title="Cantidad mínima antes de alerta de reabastecimiento">
+                        <small style="color: #6c757d;">💡 Alerta cuando stock baje de este valor</small>
                     </div>
                 </div>
                 
-                <div style="margin-top: 30px; text-align: right;">
+                <div style="margin-top: 30px; text-align: right; padding-top: 20px; border-top: 1px solid #dee2e6;">
                     <button type="button" onclick="cerrarModal()" class="btn btn-secondary">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button type="submit" class="btn btn-primary" id="btnGuardarInsumo">Guardar</button>
                 </div>
             </form>
         </div>
@@ -338,22 +366,127 @@ $categorias = $db->fetchAll(
             .then(data => {
                 if (data.success) {
                     const ins = data.insumo;
-                    const valorStock = (ins.Stock_Actual * ins.Precio_Costo).toFixed(2);
-                    alert(`DETALLES DEL INSUMO\n\n` +
-                          `Nombre: ${ins.Nombre}\n` +
-                          `Categoría: ${ins.Categoria}\n` +
-                          `Descripción: ${ins.Descripcion || 'N/A'}\n` +
-                          `Stock Actual: ${ins.Stock_Actual} ${ins.Unidad_Medida}\n` +
-                          `Stock Mínimo: ${ins.Stock_Minimo} ${ins.Unidad_Medida}\n` +
-                          `Precio Costo: S/ ${parseFloat(ins.Precio_Costo).toFixed(2)}\n` +
-                          `Valor en Stock: S/ ${valorStock}\n` +
-                          `Estado: ${ins.Estado}`);
+                    mostrarModalDetalles(ins);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 alert('Error de conexión');
             });
+    }
+
+    function mostrarModalDetalles(insumo) {
+        const modal = document.getElementById('modalDetalles');
+        const contenido = document.getElementById('detallesContenido');
+        
+        const estadoBadge = insumo.Estado === 'Activo' 
+            ? '<span class="badge badge-success">Activo</span>' 
+            : '<span class="badge badge-secondary">Inactivo</span>';
+        
+        const stockCritico = parseFloat(insumo.Stock_Actual) <= parseFloat(insumo.Stock_Minimo);
+        const stockBadge = stockCritico
+            ? '<span class="badge badge-danger"><i class="fas fa-exclamation-triangle"></i> Stock Crítico</span>'
+            : '<span class="badge badge-success"><i class="fas fa-check-circle"></i> Stock Normal</span>';
+        
+        const valorStock = (parseFloat(insumo.Stock_Actual) * parseFloat(insumo.Precio_Costo)).toFixed(2);
+        
+        // Calcular porcentaje de stock en base a 100%
+        // Si stock actual >= stock mínimo → porcentaje proporcional hasta 100%
+        // Si stock actual < stock mínimo → porcentaje bajo (crítico)
+        let porcentajeStock;
+        let porcentajeTexto;
+        
+        if (parseFloat(insumo.Stock_Actual) >= parseFloat(insumo.Stock_Minimo)) {
+            // Stock normal: calcular excedente sobre el mínimo
+            const excedente = parseFloat(insumo.Stock_Actual) - parseFloat(insumo.Stock_Minimo);
+            const rangoOptimo = parseFloat(insumo.Stock_Minimo) * 2; // 2x el mínimo = 100%
+            porcentajeStock = Math.min(((parseFloat(insumo.Stock_Actual) / rangoOptimo) * 100), 100);
+            porcentajeTexto = porcentajeStock.toFixed(0) + '%';
+        } else {
+            // Stock crítico: porcentaje respecto al mínimo
+            porcentajeStock = (parseFloat(insumo.Stock_Actual) / parseFloat(insumo.Stock_Minimo)) * 100;
+            porcentajeTexto = porcentajeStock.toFixed(0) + '% (Bajo mínimo)';
+        }
+        
+        contenido.innerHTML = `
+            <div class="detalle-header">
+                <h3>${insumo.Nombre}</h3>
+                <div style="display: flex; gap: 8px;">
+                    ${estadoBadge}
+                    ${stockBadge}
+                </div>
+            </div>
+            
+            <div class="detalle-seccion">
+                <div class="detalle-titulo"><i class="fas fa-info-circle"></i> Información General</div>
+                <div class="detalle-grid">
+                    <div class="detalle-item">
+                        <span class="detalle-label">Categoría:</span>
+                        <span class="detalle-valor">${insumo.Categoria}</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-label">Unidad de Medida:</span>
+                        <span class="detalle-valor">${insumo.Unidad_Medida}</span>
+                    </div>
+                    <div class="detalle-item" style="grid-column: span 2;">
+                        <span class="detalle-label">Descripción:</span>
+                        <span class="detalle-valor">${insumo.Descripcion || '<em style="color: #999;">Sin descripción</em>'}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detalle-seccion">
+                <div class="detalle-titulo"><i class="fas fa-boxes"></i> Control de Stock</div>
+                <div class="detalle-grid">
+                    <div class="detalle-item">
+                        <span class="detalle-label">Stock Actual:</span>
+                        <span class="detalle-valor" style="font-weight: 600; color: ${stockCritico ? '#dc3545' : '#28a745'};">
+                            ${parseFloat(insumo.Stock_Actual).toFixed(2)} ${insumo.Unidad_Medida}
+                        </span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-label">Stock Mínimo:</span>
+                        <span class="detalle-valor">${parseFloat(insumo.Stock_Minimo).toFixed(2)} ${insumo.Unidad_Medida}</span>
+                    </div>
+                </div>
+                
+                <!-- Barra de progreso de stock -->
+                <div style="margin-top: 15px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <small style="color: #6c757d; font-weight: 500;">Nivel de Stock</small>
+                        <small style="color: #6c757d; font-weight: 500;">${porcentajeTexto}</small>
+                    </div>
+                    <div style="background: #e9ecef; height: 12px; border-radius: 6px; overflow: hidden;">
+                        <div style="width: ${porcentajeStock}%; height: 100%; background: ${stockCritico ? '#dc3545' : '#28a745'}; transition: width 0.3s ease;"></div>
+                    </div>
+                    ${stockCritico ? '<small style="color: #dc3545; margin-top: 5px; display: block;"><i class="fas fa-exclamation-circle"></i> ¡Requiere reabastecimiento!</small>' : '<small style="color: #28a745; margin-top: 5px; display: block;"><i class="fas fa-check-circle"></i> Stock en nivel aceptable</small>'}
+                </div>
+            </div>
+            
+            <div class="detalle-seccion">
+                <div class="detalle-titulo"><i class="fas fa-dollar-sign"></i> Información de Costos</div>
+                <div class="detalle-stats">
+                    <div class="stat-box">
+                        <div class="stat-valor">S/ ${parseFloat(insumo.Precio_Costo).toFixed(2)}</div>
+                        <div class="stat-label">Precio de Costo Unitario</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-valor">S/ ${valorStock}</div>
+                        <div class="stat-label">Valor Total en Stock</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-valor">${parseFloat(insumo.Stock_Actual).toFixed(2)}</div>
+                        <div class="stat-label">Unidades Disponibles</div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        modal.style.display = 'block';
+    }
+
+    function cerrarModalDetalles() {
+        document.getElementById('modalDetalles').style.display = 'none';
     }
 
     function toggleEstado(id, estadoActual) {
@@ -394,8 +527,19 @@ $categorias = $db->fetchAll(
         const formData = new FormData(this);
         const data = Object.fromEntries(formData);
         
-        if (!data.nombre.trim()) {
+        // Validaciones del lado cliente
+        if (!data.nombre || !data.nombre.trim()) {
             alert('El nombre del insumo es obligatorio');
+            return;
+        }
+        
+        if (!data.categoriaId || data.categoriaId === '') {
+            alert('Debe seleccionar una categoría');
+            return;
+        }
+        
+        if (!data.unidadMedida || data.unidadMedida === '') {
+            alert('Debe seleccionar una unidad de medida');
             return;
         }
         
@@ -414,18 +558,27 @@ $categorias = $db->fetchAll(
             return;
         }
         
-        const submitBtn = this.querySelector('button[type="submit"]');
+        const submitBtn = document.getElementById('btnGuardarInsumo');
         const originalText = submitBtn.innerHTML;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
         submitBtn.disabled = true;
+        
+        console.log('Enviando datos de insumo:', data);
         
         fetch('../../../api/admin/guardar-insumo.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log('Response data:', data);
             if (data.success) {
                 alert('Insumo guardado correctamente');
                 location.reload();
@@ -436,18 +589,23 @@ $categorias = $db->fetchAll(
             }
         })
         .catch(error => {
-            console.error('Error:', error);
-            alert('Error de conexión');
+            console.error('Error completo:', error);
+            alert('Error de conexión: ' + error.message);
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
         });
     });
 
-    // Cerrar modal al hacer clic fuera
+    // Cerrar modales al hacer clic fuera
     window.onclick = function(event) {
-        const modal = document.getElementById('modalInsumo');
-        if (event.target === modal) {
-            modal.style.display = 'none';
+        const modalInsumo = document.getElementById('modalInsumo');
+        const modalDetalles = document.getElementById('modalDetalles');
+        
+        if (event.target === modalInsumo) {
+            modalInsumo.style.display = 'none';
+        }
+        if (event.target === modalDetalles) {
+            modalDetalles.style.display = 'none';
         }
     }
     </script>
@@ -472,6 +630,8 @@ $categorias = $db->fetchAll(
         width: 80%;
         max-width: 600px;
         position: relative;
+        /* Asegura scroll cuando el contenido sea largo */
+        overflow-y: auto;
     }
 
     .close {
@@ -487,6 +647,109 @@ $categorias = $db->fetchAll(
 
     .close:hover {
         color: black;
+    }
+
+    /* Estilos para modal de detalles */
+    .modal-detalles {
+        animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+        from {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .detalle-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e9ecef;
+        margin-bottom: 25px;
+    }
+
+    .detalle-header h3 {
+        margin: 0;
+        color: #2c3e50;
+        font-size: 1.5rem;
+    }
+
+    .detalle-seccion {
+        margin-bottom: 25px;
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+    }
+
+    .detalle-titulo {
+        font-weight: 600;
+        color: #495057;
+        font-size: 1rem;
+        margin-bottom: 15px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .detalle-titulo i {
+        margin-right: 8px;
+        color: #6c757d;
+    }
+
+    .detalle-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .detalle-item {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .detalle-label {
+        font-size: 0.85rem;
+        color: #6c757d;
+        font-weight: 500;
+    }
+
+    .detalle-valor {
+        font-size: 0.95rem;
+        color: #212529;
+        font-weight: 400;
+    }
+
+    .detalle-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+    }
+
+    .stat-box {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .stat-valor {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 8px;
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+        color: #6c757d;
+        font-weight: 500;
     }
     </style>
 </body>

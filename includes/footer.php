@@ -27,6 +27,8 @@ if (!isset($baseUrl)) {
                 <ul>
                     <li><i class="fas fa-phone"></i> +51 991 183 777</li>
                     <li><i class="fab fa-whatsapp"></i> +51 991 183 777</li>
+                    <li><i class="fas fa-map-marker-alt"></i> Tumbes, Perú - San Martín 24002</li>
+                    <li style="margin-left: 20px; font-size: 12px; color: #999;">Referencia: Por la torta</li>
                     <li><a href="#"><i class="fas fa-comment-dots"></i> Encuesta de satisfacción</a></li>
                 </ul>
             </div>

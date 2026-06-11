@@ -10,7 +10,7 @@ if (empty($_SESSION['usuario_id']) || ($_SESSION['usuario_scope'] ?? '') !== 'ba
     exit;
 }
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' && $_SERVER['REQUEST_METHOD'] !== 'GET') {
     http_response_code(405);
     echo json_encode(['ok' => false, 'message' => 'Método no permitido.']);
     exit;
@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 require_once __DIR__ . '/../../../config/conexion.php';
 
-$accion = $_POST['accion'] ?? '';
+$accion = $_POST['accion'] ?? $_GET['accion'] ?? '';
 $db = getDB();
 
 // ── Helpers ──────────────────────────────────────────────────
@@ -139,6 +139,8 @@ switch ($accion) {
         $imagenURL = subirImagen();
 
         try {
+            $db->beginTransaction();
+            
             if ($imagenURL) {
                 $db->execute(
                     "UPDATE Plato SET Nombre=:nombre, Descripcion=:desc, Imagen_URL=:imagen, Estado=:estado, 
@@ -161,10 +163,12 @@ switch ($accion) {
                 );
             }
 
-            // Sincronizar variantes
+            // Sincronizar variantes - Marcar como activo=1 las enviadas, inactivo=0 las demás
             $varIDs   = $_POST['variante_id']     ?? [];
             $varNoms  = $_POST['variante_nombre'] ?? [];
             $varPrecs = $_POST['variante_precio'] ?? [];
+            
+            $idsEnviados = [];
 
             foreach ($varNoms as $i => $vNombre) {
                 $vNombre = trim($vNombre);
@@ -173,23 +177,40 @@ switch ($accion) {
                 if ($vNombre === '' || $vPrecio <= 0) continue;
 
                 if ($vID > 0) {
+                    $idsEnviados[] = $vID;
                     $db->execute(
-                        "UPDATE Plato_Variante SET Nombre=:nombre, Precio_Venta=:precio 
+                        "UPDATE Plato_Variante SET Nombre=:nombre, Precio_Venta=:precio, Estado=1
                          WHERE VarianteID=:vID AND PlatoID=:platoID",
                         [':nombre' => $vNombre, ':precio' => $vPrecio, ':vID' => $vID, ':platoID' => $id]
                     );
                 } else {
                     $db->execute(
-                        "INSERT INTO Plato_Variante (PlatoID, Nombre, Precio_Venta) VALUES (:platoID, :nombre, :precio)",
+                        "INSERT INTO Plato_Variante (PlatoID, Nombre, Precio_Venta, Estado) VALUES (:platoID, :nombre, :precio, 1)",
                         [':platoID' => $id, ':nombre' => $vNombre, ':precio' => $vPrecio]
                     );
+                    $idsEnviados[] = (int)$db->lastInsertId();
                 }
             }
 
+            // Marcar como inactivas (Estado=0) las variantes NO enviadas
+            if (!empty($idsEnviados)) {
+                $placeholders = implode(',', $idsEnviados);
+                $db->execute(
+                    "UPDATE Plato_Variante SET Estado=0 WHERE PlatoID = :platoID AND VarianteID NOT IN ($placeholders)",
+                    [':platoID' => $id]
+                );
+            } else {
+                $db->execute("UPDATE Plato_Variante SET Estado=0 WHERE PlatoID = :platoID", [':platoID' => $id]);
+            }
+
+            $db->commit();
             ok('Plato actualizado correctamente.');
         } catch (Exception $e) {
+            if ($db->inTransaction()) {
+                $db->rollback();
+            }
             error_log('Error editar plato: ' . $e->getMessage());
-            fail('Error al actualizar el plato.');
+            fail('Error al actualizar el plato: ' . $e->getMessage());
         }
 
     // ── Cambiar estado (Disponible / Oculto) ─────────────────
@@ -208,7 +229,6 @@ switch ($accion) {
             error_log('Error toggle_estado: ' . $e->getMessage());
             fail('Error al actualizar estado.');
         }
-
     // ── Cambiar flag Top / Promo ──────────────────────────────
     case 'toggle_flag':
         $id    = (int)($_POST['id']    ?? 0);
@@ -217,7 +237,12 @@ switch ($accion) {
 
         if ($id === 0 || !in_array($flag, ['top', 'promo'])) fail('Datos inválidos.');
 
-        $col  = $flag === 'top' ? 'Es_Top' : 'Es_Promo';
+        // Mapear flag a columna de BD
+        $columnas = [
+            'top' => 'Es_Top',
+            'promo' => 'Es_Promo'
+        ];
+        $col = $columnas[$flag];
         
         try {
             $db->execute(
@@ -230,6 +255,19 @@ switch ($accion) {
             fail('Error al actualizar flag.');
         }
 
-    default:
+    // ── Listar categorías (para select en modal) ─────────────
+    case 'listar_categorias':
+        try {
+            $categorias = $db->fetchAll(
+                "SELECT CatID, Nombre FROM Categoria WHERE Tipo = 'Plato' ORDER BY Nombre ASC"
+            );
+            echo json_encode(['ok' => true, 'data' => $categorias]);
+            exit;
+        } catch (Exception $e) {
+            error_log('Error listar_categorias: ' . $e->getMessage());
+            fail('Error al cargar categorías.');
+        }
+
+default:
         fail('Acción no reconocida.');
 }

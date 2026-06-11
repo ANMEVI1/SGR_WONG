@@ -60,7 +60,7 @@ try {
                 cat.Nombre      AS categoria,
                 MIN(pv.Precio_Venta) AS precio_min,
                 MAX(pv.Precio_Venta) AS precio_max,
-                COUNT(pv.PlatoVarianteID) AS variantes
+                COUNT(pv.VarianteID) AS variantes
             FROM Plato pl
             JOIN Categoria cat ON pl.CatID = cat.CatID
             JOIN Plato_Variante pv ON pl.PlatoID = pv.PlatoID
@@ -73,11 +73,14 @@ try {
     
     // Procesar resultados
     $platosProcessed = array_map(function($plato) {
+        // Si no hay imagen o la ruta está vacía, usar un placeholder SVG
+        $imagen = !empty($plato['imagen']) ? $plato['imagen'] : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23f0ece4' width='400' height='300'/%3E%3Ctext fill='%23c9954a' font-size='18' font-weight='bold' x='50%25' y='50%25' text-anchor='middle' dominant-baseline='middle'%3ESin imagen%3C/text%3E%3C/svg%3E";
+        
         return [
             'id' => (int) $plato['id'],
             'nombre' => $plato['nombre'],
             'descripcion' => $plato['descripcion'] ?? '',
-            'imagen' => !empty($plato['imagen']) ? $plato['imagen'] : 'assets/img/platos/default.jpg',
+            'imagen' => $imagen,
             'top' => (bool) $plato['top'],
             'promo' => (bool) $plato['promo'],
             'categoria' => $plato['categoria'],

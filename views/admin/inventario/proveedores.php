@@ -73,6 +73,10 @@ $tiposProducto = $db->fetchAll(
             <div class="admin-header">
                 <h1><i class="fas fa-truck"></i> Gestión de Proveedores</h1>
                 <p>Administración completa de proveedores y suministros</p>
+                <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 10px 15px; margin-top: 15px; border-radius: 4px; font-size: 0.85rem;">
+                    <i class="fas fa-lightbulb" style="color: #856404;"></i> 
+                    <strong>Consejo:</strong> Usa los filtros para encontrar rápidamente proveedores por estado, tipo de producto o movimientos.
+                </div>
             </div>
 
             <!-- Estadísticas -->
@@ -225,6 +229,17 @@ $tiposProducto = $db->fetchAll(
         </main>
     </div>
 
+    <!-- Modal Ver Detalles Proveedor -->
+    <div id="modalDetalles" class="modal" style="display: none;">
+        <div class="modal-content modal-detalles" style="max-width: 700px; max-height: 85vh; overflow-y: auto;">
+            <span class="close" onclick="cerrarModalDetalles()">&times;</span>
+            <div id="detallesContenido"></div>
+            <div style="margin-top: 30px; text-align: right;">
+                <button onclick="cerrarModalDetalles()" class="btn btn-secondary">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Nuevo/Editar Proveedor -->
     <div id="modalProveedor" class="modal" style="display: none;">
         <div class="modal-content" style="max-width: 900px;">
@@ -241,8 +256,9 @@ $tiposProducto = $db->fetchAll(
                     
                     <div class="form-group">
                         <label for="ruc">RUC *</label>
-                        <input type="text" id="ruc" name="ruc" class="form-control" pattern="[0-9]{11}" maxlength="11" required>
-                        <small style="color: #6c757d;">11 dígitos</small>
+                        <input type="text" id="ruc" name="ruc" class="form-control" pattern="[0-9]{11}" maxlength="11" required
+                               title="Número de RUC de 11 dígitos del proveedor">
+                        <small style="color: #6c757d;">💡 Debe tener exactamente 11 dígitos</small>
                     </div>
                     
                     <div class="form-group">
@@ -263,7 +279,9 @@ $tiposProducto = $db->fetchAll(
                     <div class="form-group">
                         <label for="tipoProducto">Tipo de Producto</label>
                         <input type="text" id="tipoProducto" name="tipoProducto" class="form-control" 
-                               placeholder="Ej: Abarrotes, Carnes, Verduras">
+                               placeholder="Ej: Abarrotes, Carnes, Verduras"
+                               title="Especifica qué tipo de productos suministra este proveedor">
+                        <small style="color: #6c757d;">💡 Ayuda a filtrar proveedores por categoría de producto</small>
                     </div>
                     
                     <div class="form-group" style="grid-column: 1 / -1;">
@@ -352,23 +370,95 @@ $tiposProducto = $db->fetchAll(
             .then(data => {
                 if (data.success) {
                     const p = data.proveedor;
-                    alert(`DETALLES DEL PROVEEDOR\n\n` +
-                          `Razón Social: ${p.Razon_Social}\n` +
-                          `RUC: ${p.Ruc}\n` +
-                          `Contacto: ${p.Contacto}\n` +
-                          `Teléfono: ${p.Telefono}\n` +
-                          `Correo: ${p.Correo || 'No registrado'}\n` +
-                          `Tipo de Producto: ${p.Tipo_Producto || 'No especificado'}\n` +
-                          `Dirección: ${p.Direccion || 'No registrada'}\n` +
-                          `Estado: ${p.Estado === 'A' ? 'Activo' : 'Inactivo'}\n` +
-                          `Total movimientos: ${p.total_movimientos || 0}\n` +
-                          `Total compras: S/ ${parseFloat(p.total_compras || 0).toFixed(2)}`);
+                    mostrarModalDetalles(p);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 alert('Error de conexión');
             });
+    }
+
+    function mostrarModalDetalles(proveedor) {
+        const modal = document.getElementById('modalDetalles');
+        const contenido = document.getElementById('detallesContenido');
+        
+        const estadoBadge = proveedor.Estado === 'A' 
+            ? '<span class="badge badge-success">Activo</span>' 
+            : '<span class="badge badge-danger">Inactivo</span>';
+        
+        const ultimaCompra = proveedor.ultima_compra 
+            ? new Date(proveedor.ultima_compra).toLocaleDateString('es-PE', { 
+                year: 'numeric', month: 'long', day: 'numeric' 
+              })
+            : 'Sin compras registradas';
+        
+        contenido.innerHTML = `
+            <div class="detalle-header">
+                <h3>${proveedor.Razon_Social}</h3>
+                ${estadoBadge}
+            </div>
+            
+            <div class="detalle-seccion">
+                <div class="detalle-titulo"><i class="fas fa-building"></i> Información Legal</div>
+                <div class="detalle-grid">
+                    <div class="detalle-item">
+                        <span class="detalle-label">RUC:</span>
+                        <span class="detalle-valor">${proveedor.Ruc}</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-label">Tipo de Producto:</span>
+                        <span class="detalle-valor">${proveedor.Tipo_Producto || '<em style="color: #999;">No especificado</em>'}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detalle-seccion">
+                <div class="detalle-titulo"><i class="fas fa-user"></i> Información de Contacto</div>
+                <div class="detalle-grid">
+                    <div class="detalle-item">
+                        <span class="detalle-label">Persona de Contacto:</span>
+                        <span class="detalle-valor">${proveedor.Contacto}</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-label">Teléfono:</span>
+                        <span class="detalle-valor"><i class="fas fa-phone" style="color: #28a745;"></i> ${proveedor.Telefono}</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-label">Correo Electrónico:</span>
+                        <span class="detalle-valor">${proveedor.Correo ? '<i class="fas fa-envelope" style="color: #17a2b8;"></i> ' + proveedor.Correo : '<em style="color: #999;">No registrado</em>'}</span>
+                    </div>
+                    <div class="detalle-item">
+                        <span class="detalle-label">Dirección:</span>
+                        <span class="detalle-valor">${proveedor.Direccion || '<em style="color: #999;">No registrada</em>'}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detalle-seccion">
+                <div class="detalle-titulo"><i class="fas fa-chart-line"></i> Estadísticas de Compras</div>
+                <div class="detalle-stats">
+                    <div class="stat-box">
+                        <div class="stat-valor">${proveedor.total_movimientos || 0}</div>
+                        <div class="stat-label">Total de Movimientos</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-valor">S/ ${parseFloat(proveedor.total_compras || 0).toFixed(2)}</div>
+                        <div class="stat-label">Total en Compras</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-valor">${ultimaCompra}</div>
+                        <div class="stat-label">Última Compra</div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        modal.style.display = 'block';
+    }
+
+    function cerrarModalDetalles() {
+        document.getElementById('modalDetalles').style.display = 'none';
     }
 
     function toggleEstado(id, estadoActual) {
@@ -468,11 +558,16 @@ $tiposProducto = $db->fetchAll(
         });
     });
 
-    // Cerrar modal al hacer clic fuera
+    // Cerrar modales al hacer clic fuera
     window.onclick = function(event) {
-        const modal = document.getElementById('modalProveedor');
-        if (event.target === modal) {
-            modal.style.display = 'none';
+        const modalProveedor = document.getElementById('modalProveedor');
+        const modalDetalles = document.getElementById('modalDetalles');
+        
+        if (event.target === modalProveedor) {
+            modalProveedor.style.display = 'none';
+        }
+        if (event.target === modalDetalles) {
+            modalDetalles.style.display = 'none';
         }
     }
     </script>
@@ -512,6 +607,109 @@ $tiposProducto = $db->fetchAll(
 
     .close:hover {
         color: black;
+    }
+
+    /* Estilos para modal de detalles */
+    .modal-detalles {
+        animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+        from {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .detalle-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e9ecef;
+        margin-bottom: 25px;
+    }
+
+    .detalle-header h3 {
+        margin: 0;
+        color: #2c3e50;
+        font-size: 1.5rem;
+    }
+
+    .detalle-seccion {
+        margin-bottom: 25px;
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+    }
+
+    .detalle-titulo {
+        font-weight: 600;
+        color: #495057;
+        font-size: 1rem;
+        margin-bottom: 15px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .detalle-titulo i {
+        margin-right: 8px;
+        color: #6c757d;
+    }
+
+    .detalle-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .detalle-item {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .detalle-label {
+        font-size: 0.85rem;
+        color: #6c757d;
+        font-weight: 500;
+    }
+
+    .detalle-valor {
+        font-size: 0.95rem;
+        color: #212529;
+        font-weight: 400;
+    }
+
+    .detalle-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+    }
+
+    .stat-box {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .stat-valor {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 8px;
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+        color: #6c757d;
+        font-weight: 500;
     }
     </style>
 </body>

@@ -84,8 +84,8 @@ class ChifaApp {
         // Cargar secciones del menú
         await Promise.all([
             this.cargarSeccion('todos', document.getElementById('menuGrid'), 'card'),
-            this.cargarSeccion('top', document.querySelector('#top-ventas .mini-carousel'), 'mini'),
-            this.cargarSeccion('promo', document.querySelector('#promociones .mini-carousel'), 'mini'),
+            this.cargarSeccion('top', document.querySelector('#top-ventas .scroll-track'), 'mini'),
+            this.cargarSeccion('promo', document.querySelector('#promociones .scroll-track'), 'mini'),
             this.cargarMenuDia(),
             this.iniciarBusqueda()
         ]);
@@ -117,35 +117,58 @@ class ChifaApp {
     }
     
     cardHTML(plato) {
-        const promo = plato.promo ? '<span class=\"promo-tag\">PROMO</span>' : '';
+        const promo = plato.promo ? '<span class="badge badge-promo">PROMO</span>' : '';
         const precio = plato.tiene_variantes 
             ? `Desde S/ ${plato.precio.toFixed(2)}` 
             : `S/ ${plato.precio.toFixed(2)}`;
+        const imagenSrc = plato.imagen || 'assets/img/platos/plato_default.png';
+        const nombreSeguro = (plato.nombre || '').replace(/'/g, '&#39;');
+        const descripcionSegura = (plato.descripcion || '').replace(/'/g, '&#39;');
             
         return `
-            <article class=\"menu-item\" onclick=\"app.verDetalle(${plato.id})\" role=\"button\" tabindex=\"0\">
-                <img src=\"${plato.imagen}\" alt=\"${plato.nombre}\" loading=\"lazy\"
-                     onerror=\"this.src='assets/img/platos/default.jpg'\">
-                <div class=\"menu-item-content\">
-                    <h3>${plato.nombre} ${promo}</h3>
-                    <p>${plato.descripcion}</p>
-                    <div class=\"menu-item-price\">${precio}</div>
-                    <button onclick=\"event.stopPropagation(); app.addToCart(${plato.id}, '${plato.nombre}', ${plato.precio}, '${plato.imagen}')\"
-                            class=\"btn btn-primary btn-small btn-full\"
-                            aria-label=\"Añadir ${plato.nombre} al carrito\">
-                        Añadir al Carrito
+            <article class="menu-item" onclick="app.verDetalle(${plato.id})" role="button" tabindex="0">
+                <div class="menu-item-img-wrap">
+                    <img src="${imagenSrc}" alt="${nombreSeguro}" loading="lazy"
+                         onerror="this.style.display='none';">
+                    <span class="menu-item-cat-badge">${plato.categoria || 'Sin categoría'}</span>
+                </div>
+                <div class="menu-item-content">
+                    <h3>${nombreSeguro} ${promo}</h3>
+                    <p>${descripcionSegura}</p>
+                    <div class="menu-item-footer">
+                        <div class="menu-item-price">${precio}</div>
+                    </div>
+                    <button onclick="event.stopPropagation(); app.addToCart(${plato.id}, \`${nombreSeguro}\`, ${plato.precio}, \`${imagenSrc}\`)" class="btn btn-primary btn-small btn-full" aria-label="Añadir al carrito">
+                        <i class="fas fa-shopping-cart"></i> Añadir
                     </button>
                 </div>
             </article>`;
     }
     
     miniCardHTML(plato) {
+        const promo = plato.promo ? '<span class="promo-badge">PROMO</span>' : '';
+        const topBadge = plato.top ? '<span class="top-card-rank">TOP</span>' : '';
+        const imagenSrc = plato.imagen || 'assets/img/platos/plato_default.png';
+        const nombreSeguro = (plato.nombre || '').replace(/'/g, '&#39;');
+        const descripcionSegura = (plato.descripcion || 'Delicioso plato de nuestra carta').replace(/'/g, '&#39;');
+        
         return `
-            <div class=\"mini-item\" onclick=\"app.verDetalle(${plato.id})\" role=\"button\" tabindex=\"0\">
-                <img src=\"${plato.imagen}\" alt=\"${plato.nombre}\" loading=\"lazy\"
-                     onerror=\"this.src='assets/img/platos/default.jpg'\">
-                <p>${plato.nombre}</p>
-                <span>S/ ${plato.precio.toFixed(2)}</span>
+            <div class="top-card" onclick="app.verDetalle(${plato.id})" role="button" tabindex="0">
+                <div class="top-card-img">
+                    <img src="${imagenSrc}" alt="${nombreSeguro}" loading="lazy"
+                         onerror="this.style.display='none';">
+                    ${topBadge}
+                </div>
+                <div class="top-card-body">
+                    <h4>${nombreSeguro} ${promo}</h4>
+                    <p>${descripcionSegura}</p>
+                    <div class="top-card-footer">
+                        <div class="top-card-price">S/ ${plato.precio.toFixed(2)}</div>
+                        <button class="top-card-add" onclick="event.stopPropagation(); app.addToCart(${plato.id}, \`${nombreSeguro}\`, ${plato.precio}, \`${imagenSrc}\`)" aria-label="Añadir al carrito">
+                            +
+                        </button>
+                    </div>
+                </div>
             </div>`;
     }
     
@@ -183,44 +206,44 @@ class ChifaApp {
             const data = await response.json();
             
             if (!data.success || !data.data?.length) {
-                contenedor.innerHTML = '<p class=\"empty-menu\">No hay menús del día disponibles.</p>';
+                contenedor.innerHTML = '<p class="empty-menu">No hay menús del día disponibles.</p>';
                 return;
             }
             
-            contenedor.innerHTML = data.data.map(menu => this.menuDiaCardHTML(menu)).join('');
+            contenedor.innerHTML = data.data.map(plato => this.menuDiaCardHTML(plato)).join('');
             
         } catch (error) {
             console.error('Error cargando menú del día:', error);
-            contenedor.innerHTML = '<p class=\"empty-menu\">Error al cargar los menús.</p>';
+            contenedor.innerHTML = '<p class="empty-menu">Error al cargar los menús.</p>';
         }
     }
     
-    menuDiaCardHTML(menu) {
-        const componentes = menu.componentes.map(c => 
-            `<li><i class=\"fas fa-check\" style=\"color: var(--gold); margin-right: 8px;\"></i>${c.descripcion}</li>`
-        ).join('');
+    menuDiaCardHTML(plato) {
+        const imagenSrc = plato.imagen || 'assets/img/platos/plato_default.png';
+        const nombreSeguro = (plato.nombre || '').replace(/'/g, '&#39;');
+        const descripcionSegura = (plato.descripcion || 'Delicioso plato de nuestra carta').replace(/'/g, '&#39;');
         
         return `
-            <div class=\"mini-item\" style=\"min-width: 320px; cursor: pointer;\" 
-                 onclick=\"app.mostrarDetalleMenuDia(${menu.id})\">
-                <img src=\"${menu.imagen}\" alt=\"${menu.nombre}\" loading=\"lazy\"
-                     onerror=\"this.src='assets/img/menu-dia/default.jpg'\">
-                <div style=\"padding: 16px;\">
-                    <p style=\"font-weight: 700; font-size: 1.1rem; margin-bottom: 10px;\">${menu.nombre}</p>
-                    <ul style=\"font-size: 0.85rem; color: #666; line-height: 1.6; padding-left: 0; margin-bottom: 12px; list-style: none;\">
-                        ${componentes}
-                    </ul>
-                    <span style=\"display: block; font-size: 1.4rem; font-weight: 800; color: var(--gold-dark);\">S/ ${menu.precio.toFixed(2)}</span>
-                    <small style=\"color: #999; font-size: 0.75rem; display: block; margin-top: 4px;\">
-                        Disponible ${menu.hora_inicio.substring(0,5)} - ${menu.hora_fin.substring(0,5)}
+            <div class="mini-item" onclick="app.verDetalle(${plato.id})" role="button" tabindex="0">
+                <img src="${imagenSrc}" alt="${nombreSeguro}" loading="lazy"
+                     onerror="this.style.display='none';">
+                <div style="padding: 20px;">
+                    <p style="font-weight: 700; font-size: 1rem; color: var(--text); margin-bottom: 8px;">${nombreSeguro}</p>
+                    <p style="font-size: 0.85rem; color: #888; line-height: 1.55; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${descripcionSegura}</p>
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 12px; border-top: 1px solid #f0ece4;">
+                        <span style="font-size: 1.3rem; font-weight: 800; color: var(--gold-dark);">S/ ${plato.precio.toFixed(2)}</span>
+                        <button class="top-card-add" onclick="event.stopPropagation(); app.addToCart(${plato.id}, \`${nombreSeguro}\`, ${plato.precio}, \`${imagenSrc}\`)" aria-label="Añadir al carrito">
+                            +
+                        </button>
+                    </div>
+                    <small style="color: #999; font-size: 0.7rem; display: block; margin-top: 8px; text-align: center;">
+                        12:00pm - 4:00pm
                     </small>
                 </div>
             </div>`;
     }
     
-    mostrarDetalleMenuDia(menuId) {
-        this.mostrarNotificacion('Funcionalidad de pedido próximamente', 'info');
-    }
+
     
     // ====================== BÚSQUEDA ======================
     initSearch() {
@@ -242,7 +265,7 @@ class ChifaApp {
                 const resultados = this.buscarPlatos(term).slice(0, 8);
                 searchResults.innerHTML = resultados.length
                     ? resultados.map(plato => `
-                        <a href=\"producto-detalle.html?id=${plato.id}\" class=\"search-result-item\">
+                        <a href=\"detalle-plato.php?id=${plato.id}\" class=\"search-result-item\">
                             <strong>${plato.nombre}</strong> — S/ ${plato.precio.toFixed(2)}
                         </a>`).join('')
                     : '<div class=\"no-results\">Sin resultados</div>';
@@ -339,7 +362,7 @@ class ChifaApp {
     }
     
     verDetalle(id) {
-        window.location.href = `producto-detalle.html?id=${id}`;
+        window.location.href = `detalle-plato.php?id=${id}`;
     }
     
     // ====================== NOTIFICACIONES ======================

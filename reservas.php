@@ -2,6 +2,13 @@
 require_once 'config/conexion.php';
 startSecureSession();
 
+// ========== PROTEGER RUTA: SOLO USUARIOS AUTENTICADOS ==========
+if (!isAuthenticated()) {
+    $_SESSION['redirect_after_login'] = $_SERVER['REQUEST_URI'];
+    header('Location: login.php');
+    exit;
+}
+
 $currentUser = getCurrentUser();
 
 // Cargar perfil completo si hay usuario
@@ -35,12 +42,12 @@ if ($currentUser) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Reserva tu mesa en Chifa Matsue - Reservas online">
     <title>Reservas - Chifa Matsue</title>
-    <link rel="stylesheet" href="css/estilos.css">
-    <link rel="stylesheet" href="css/header.css">
-    <link rel="stylesheet" href="css/modal-perfil.css">
-    <link rel="stylesheet" href="css/reservas.css">
-    <link rel="stylesheet" href="css/modules/modal-confirmacion-reserva.css">
-    <link rel="stylesheet" href="css/responsivo.css">
+    <link rel="stylesheet" href="css/estilos.css?v=2.0">
+    <link rel="stylesheet" href="css/header.css?v=2.0">
+    <link rel="stylesheet" href="css/modal-perfil.css?v=2.0">
+    <link rel="stylesheet" href="css/reservas.css?v=2.0">
+    <link rel="stylesheet" href="css/modules/modal-confirmacion-reserva.css?v=2.0">
+    <link rel="stylesheet" href="css/responsivo.css?v=2.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -231,10 +238,11 @@ if ($currentUser) {
                                     </label>
                                     <select name="metodo_pago" required style="background: white;">
                                         <option value="">Selecciona método de pago...</option>
-                                        <option value="yape">Yape</option>
-                                        <option value="plin">Plin</option>
-                                        <option value="transferencia">Transferencia bancaria</option>
-                                        <option value="tarjeta">Tarjeta de crédito/débito</option>
+                                        <option value="efectivo">💵 Efectivo - Pago en local (sin señal)</option>
+                                        <option value="yape">Yape (señal anticipada)</option>
+                                        <option value="plin">Plin (señal anticipada)</option>
+                                        <option value="transferencia">Transferencia bancaria (señal anticipada)</option>
+                                        <option value="tarjeta">Tarjeta de crédito/débito (señal anticipada)</option>
                                     </select>
                                 </div>
                                 <div id="instruccionesPago" style="margin-top: 15px; padding: 15px; background: #d1ecf1; border-radius: 8px; display: none;">
@@ -309,7 +317,8 @@ if ($currentUser) {
                                 </p>
                                 <p>
                                     <i class="fas fa-map-marker-alt" style="color: var(--gold); margin-right: 8px;"></i>
-                                    <strong>Dirección:</strong> Zorritos, Tumbes, Perú
+                                    <strong>Dirección:</strong> Tumbes, Perú - San Martín 24002<br>
+                                    <small style="margin-left: 28px; color: #666;">Referencia: Por la torta</small>
                                 </p>
                             </div>
                         </div>
@@ -329,16 +338,16 @@ if ($currentUser) {
         <i class="fab fa-whatsapp"></i>
     </a>
 
-    <script src="js/sidebar.js"></script>
-    <script src="js/modal-perfil.js"></script>
+    <script src="js/sidebar.js?v=2.0"></script>
+    <script src="js/modal-perfil.js?v=2.0"></script>
     <!-- Configuración de ruta base para JavaScript -->
     <script>
         // Establecer ruta base para las APIs
         window.APP_BASE_URL = window.location.pathname.replace(/\/[^\/]*$/, '/');
     </script>
     <!-- Módulo de modal de confirmación -->
-    <script src="js/modules/modal-confirmacion-reserva.js"></script>
+    <script src="js/modules/modal-confirmacion-reserva.js?v=2.0"></script>
     <!-- Módulo principal de reservas -->
-    <script src="js/reservas/cliente-mejorado.js"></script>
+    <script src="js/reservas/cliente-mejorado.js?v=2.0"></script>
 </body>
 </html>

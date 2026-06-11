@@ -122,7 +122,7 @@ try {
     // Guardar insumo
     if ($insumoId) {
         // Actualizar
-        $db->query(
+        $db->execute(
             "UPDATE Insumo 
              SET Nombre = :nombre, 
                  Descripcion = :desc, 
@@ -145,7 +145,7 @@ try {
         );
     } else {
         // Crear
-        $db->query(
+        $db->execute(
             "INSERT INTO Insumo (Nombre, Descripcion, CatID, Precio_Costo, Stock_Actual, Stock_Minimo, Unidad_Medida, Estado) 
              VALUES (:nombre, :desc, :catId, :precio, :stockActual, :stockMinimo, :unidad, 'Activo')",
             [

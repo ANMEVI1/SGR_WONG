@@ -348,7 +348,7 @@ $categorias = $db->fetchAll(
                             : `<td>${elem.Unidad_Medida}</td>`
                         }
                         <td>
-                            <button onclick="cambiarCategoria${esPlato ? 'Plato' : 'Insumo'}(${elem.ID}, '${elem.Nombre.replace(/'/g, "\\'") }', ${categoria.CatID})" 
+                            <button onclick="cambiarCategoria${esPlato ? 'Plato' : 'Insumo'}(${esPlato ? elem.PlatoID : elem.InsumoID}, '${elem.Nombre.replace(/'/g, "\\'") }', ${categoria.CatID})" 
                                     class="btn btn-sm" style="background: #ff9800; color: white;">
                                 <i class="fas fa-exchange-alt"></i> Cambiar
                             </button>

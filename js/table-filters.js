@@ -30,7 +30,8 @@ class TableFilter {
         
         // Configurar filtros
         this.options.filters.forEach(filter => {
-            const filterElement = document.getElementById(filter.id);
+            const filterId = filter.selectId || filter.id;
+            const filterElement = document.getElementById(filterId);
             if (filterElement) {
                 filterElement.addEventListener('change', () => this.filter());
             }
@@ -84,10 +85,32 @@ class TableFilter {
     }
     
     shouldShowRow(row, searchTerm, filterValues) {
-        // Verificar filtros
-        for (const [attribute, value] of Object.entries(filterValues)) {
-            if (value && row.dataset[attribute.replace('data-', '')] !== value) {
-                return false;
+        // Verificar filtros con customMatcher o comparación estándar
+        for (const filter of this.options.filters) {
+            const element = document.getElementById(filter.selectId || filter.id);
+            if (!element) {
+                console.warn('Filtro no encontrado:', filter.selectId || filter.id);
+                continue;
+            }
+            
+            const filterValue = element.value;
+            if (!filterValue) continue;
+            
+            // Si tiene customMatcher, usarlo
+            if (filter.customMatcher) {
+                const resultado = filter.customMatcher(row, filterValue);
+                console.log('customMatcher resultado:', resultado, 'para filtro:', filterValue);
+                if (!resultado) {
+                    return false;
+                }
+            } else if (filter.attribute) {
+                // Comparación estándar solo si tiene attribute
+                const attribute = filter.attribute.replace('data-', '');
+                const rowValue = row.getAttribute(filter.attribute) || row.dataset[attribute];
+                console.log('Comparando estándar:', {attribute, rowValue, filterValue});
+                if (rowValue !== filterValue) {
+                    return false;
+                }
             }
         }
         
@@ -132,7 +155,8 @@ class TableFilter {
         
         // Limpiar filtros
         this.options.filters.forEach(filter => {
-            const element = document.getElementById(filter.id);
+            const filterId = filter.selectId || filter.id;
+            const element = document.getElementById(filterId);
             if (element) element.value = '';
         });
         

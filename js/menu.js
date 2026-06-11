@@ -6,10 +6,11 @@ const API_MENU = 'api/menu.php';
 
 function cardHTML(plato, claseExtra = '') {
     const promo = plato.promo ? '<span class="promo-tag">PROMO</span>' : '';
+    const placeholderSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23f0ece4' width='400' height='300'/%3E%3Ctext fill='%23c9954a' font-size='18' font-weight='bold' x='50%25' y='50%25' text-anchor='middle' dominant-baseline='middle'%3ESin imagen%3C/text%3E%3C/svg%3E";
     return `
         <article class="menu-item ${claseExtra}" onclick="verDetalle(${plato.id})">
             <img src="${plato.imagen}" alt="${plato.nombre}" loading="lazy"
-                 onerror="this.src='assets/img/platos/default.jpg'">
+                 onerror="if(this.src!=='${placeholderSvg}')this.src='${placeholderSvg}'">
             <div class="menu-item-content">
                 <h3>${plato.nombre} ${promo}</h3>
                 <p>${plato.descripcion || ''}</p>
@@ -23,10 +24,11 @@ function cardHTML(plato, claseExtra = '') {
 }
 
 function miniCardHTML(plato) {
+    const placeholderSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='150'%3E%3Crect fill='%23f0ece4' width='200' height='150'/%3E%3Ctext fill='%23c9954a' font-size='14' font-weight='bold' x='50%25' y='50%25' text-anchor='middle' dominant-baseline='middle'%3E?%3C/text%3E%3C/svg%3E";
     return `
         <div class="mini-item" onclick="verDetalle(${plato.id})">
             <img src="${plato.imagen}" alt="${plato.nombre}" loading="lazy"
-                 onerror="this.src='assets/img/platos/default.jpg'">
+                 onerror="if(this.src!=='${placeholderSvg}')this.src='${placeholderSvg}'">
             <p>${plato.nombre}</p>
             <span>S/ ${plato.precio.toFixed(2)}</span>
         </div>`;

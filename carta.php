@@ -31,7 +31,7 @@ $currentUser = getCurrentUser();
             <div class="container">
                 <div class="section-header">
                     <span class="section-eyebrow">Carta Completa</span>
-                    <h2 class="section-title" style="color: white;">Nuestro Menú</h2>
+                    <h2 class="section-title" style="color: white;">Nuestra Carta</h2>
                     <p class="section-subtitle" style="color: white;">Explora nuestra variedad de platos tradicionales</p>
                 </div>
 

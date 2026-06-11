@@ -62,6 +62,11 @@ $metodos = $db->fetchAll(
             <div class="admin-header">
                 <h1><i class="fas fa-credit-card"></i> Gestión de Métodos de Pago</h1>
                 <p>Administración de métodos de pago aceptados en el restaurante</p>
+                <div style="background: #e7f3ff; border-left: 4px solid #0066cc; padding: 12px 15px; margin-top: 15px; border-radius: 4px; font-size: 0.9rem;">
+                    <i class="fas fa-info-circle" style="color: #0066cc;"></i> 
+                    <strong>Nota sobre Iconos:</strong> La columna "Icono" muestra el NOMBRE del archivo de imagen. 
+                    Para que se visualicen correctamente, las imágenes deben estar en la carpeta <code>assets/img/metodos-pago/</code> del servidor.
+                </div>
             </div>
 
             <!-- Estadísticas -->
@@ -149,9 +154,12 @@ $metodos = $db->fetchAll(
                             <td><strong><?= htmlspecialchars($metodo['Nombre']) ?></strong></td>
                             <td>
                                 <?php if ($metodo['Icono']): ?>
-                                    <code><?= htmlspecialchars($metodo['Icono']) ?></code>
+                                    <span style="display: inline-flex; align-items: center; gap: 8px;">
+                                        <i class="fas fa-image" style="color: #17a2b8;"></i>
+                                        <code style="background: #f8f9fa; padding: 2px 6px; border-radius: 3px;"><?= htmlspecialchars($metodo['Icono']) ?></code>
+                                    </span>
                                 <?php else: ?>
-                                    <small style="color: #6c757d;">Sin icono</small>
+                                    <small style="color: #6c757d;"><i class="fas fa-ban"></i> Sin icono</small>
                                 <?php endif; ?>
                             </td>
                             <td>
@@ -204,9 +212,15 @@ $metodos = $db->fetchAll(
                     </div>
                     
                     <div class="form-group">
-                        <label for="icono">Nombre del Icono</label>
-                        <input type="text" id="icono" name="icono" class="form-control" placeholder="Ej: efectivo.png, yape.png">
-                        <small style="color: #6c757d;">Archivo de imagen para mostrar en la interfaz</small>
+                        <label for="icono">Nombre del Archivo de Icono</label>
+                        <input type="text" id="icono" name="icono" class="form-control" 
+                               placeholder="Ej: efectivo.png, yape.png, tarjeta.png"
+                               title="Solo ingresa el NOMBRE del archivo de imagen, no subas el archivo aquí">
+                        <small style="color: #6c757d;">
+                            💡 <strong>Importante:</strong> Solo ingresa el NOMBRE del archivo (ej: <code>yape.png</code>). 
+                            Las imágenes deben estar en <code>assets/img/metodos-pago/</code> del servidor.
+                            <br>Este campo NO sube imágenes, solo guarda la referencia.
+                        </small>
                     </div>
                     
                     <div class="form-group">
@@ -214,7 +228,9 @@ $metodos = $db->fetchAll(
                             <input type="checkbox" id="requiereReferencia" name="requiereReferencia" value="1" style="width: auto;">
                             <span>Requiere Número de Referencia/Operación</span>
                         </label>
-                        <small style="color: #6c757d; margin-left: 30px;">Marcar si el cajero debe ingresar número de operación al cobrar</small>
+                        <small style="color: #6c757d; margin-left: 30px;">
+                            💡 Marcar si el cajero debe ingresar número de operación al cobrar (para Yape, Plin, transferencias)
+                        </small>
                     </div>
                     
                     <div class="form-group">

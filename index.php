@@ -11,10 +11,11 @@ $currentUser = getCurrentUser();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Chifa Matsue - Sabores chinos y peruanos en un solo lugar. Menú de chifa, chaufa, tallarines y más.">
     <title>Chifa Matsue - Menú de Chifa y Chino-Peruano</title>
-    <link rel="stylesheet" href="css/estilos.css">
-    <link rel="stylesheet" href="css/header.css">
-    <link rel="stylesheet" href="css/modal-perfil.css">
-    <link rel="stylesheet" href="css/responsivo.css">
+    <link rel="stylesheet" href="css/estilos.css?v=2.0">
+    <link rel="stylesheet" href="css/header.css?v=2.0">
+    <link rel="stylesheet" href="css/modal-perfil.css?v=2.0">
+    <link rel="stylesheet" href="css/cards-platos.css?v=2.0">
+    <link rel="stylesheet" href="css/responsivo.css?v=2.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -47,22 +48,22 @@ $currentUser = getCurrentUser();
         <!-- Menú del Día (solo visible 12pm-4pm) -->
         <section class="menu-dia container" id="menu-dia" style="display: none; padding: 80px 0;">
             <h2 class="section-title" style="color: white;">Menú del Día</h2>
-            <p class="section-subtitle" style="color: white;">Combos económicos disponibles de 12:00pm a 4:00pm</p>
-            <div class="mini-carousel" id="menuDiaGrid"></div>
+            <p class="section-subtitle" style="color: white;">Porciones personales económicas disponibles de 12:00pm a 4:00pm</p>
+            <div class="scroll-track" id="menuDiaGrid" style="display: flex; overflow-x: auto; gap: 26px; padding: 16px 8px 28px; scrollbar-width: none;"></div>
         </section>
 
         <!-- Top Ventas -->
         <section class="top-ventas container" id="top-ventas">
             <h2 class="section-title" style="color: white;">Top Ventas</h2>
             <p class="section-subtitle" style="color: white;">Los favoritos de nuestros clientes</p>
-            <div class="mini-carousel"></div>
+            <div class="scroll-track" style="display: flex; overflow-x: auto; gap: 26px; padding: 16px 8px 28px; scrollbar-width: none;"></div>
         </section>
 
         <!-- Promociones -->
         <section class="promociones container" id="promociones">
             <h2 class="section-title" style="color: white;">Promociones</h2>
             <p class="section-subtitle" style="color: white;">Ofertas especiales que no puedes perderte</p>
-            <div class="mini-carousel"></div>
+            <div class="scroll-track" style="display: flex; overflow-x: auto; gap: 26px; padding: 16px 8px 28px; scrollbar-width: none;"></div>
         </section>
 
         <!-- Menú Completo -->
@@ -154,8 +155,8 @@ $currentUser = getCurrentUser();
     <a href="https://wa.me/+51991183777?text=Hola,%20quiero%20hacer%20un%20pedido" target="_blank" class="whatsapp-btn" aria-label="Contactar por WhatsApp" title="Contactar por WhatsApp">
         <i class="fab fa-whatsapp"></i>
     </a>
-    <script src="js/app.js"></script>
-    <script src="js/sidebar.js"></script>
-    <script src="js/modal-perfil.js"></script>
+    <script src="js/app.js?v=2.0"></script>
+    <script src="js/sidebar.js?v=2.0"></script>
+    <script src="js/modal-perfil.js?v=2.0"></script>
 </body>
 </html>

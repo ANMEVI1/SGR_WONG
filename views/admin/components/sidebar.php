@@ -93,9 +93,6 @@ if ($currentDir === 'admin') {
             <a href="<?= $baseUrl ?>usuarios/index.php" class="nav-item <?= $currentPage === 'index.php' && $currentDir === 'usuarios' ? 'active' : '' ?>">
                 <i class="fas fa-user-cog"></i> Usuarios Sistema
             </a>
-            <a href="<?= $baseUrl ?>web/pedidos-online.php" class="nav-item <?= $currentPage === 'pedidos-online.php' ? 'active' : '' ?>">
-                <i class="fas fa-laptop"></i> Pedidos Online
-            </a>
         </div>
         
         <hr style="margin: 25px 20px; border: none; border-top: 1px solid var(--admin-border);">
